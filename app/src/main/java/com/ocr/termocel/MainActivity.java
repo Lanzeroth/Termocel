@@ -8,6 +8,10 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 import com.ocr.termocel.model.Sensor;
@@ -24,6 +28,8 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String TAG = MainActivity.class.getSimpleName();
+
     public static Bus bus;
 
     private int selectedId;
@@ -38,6 +44,24 @@ public class MainActivity extends AppCompatActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
 
+    @InjectView(R.id.textViewTelephone)
+    TextView textViewTelephone;
+
+    @InjectView(R.id.textViewLastKnownTemp)
+    TextView textViewLastKnownTemp;
+
+    @InjectView(R.id.textViewStatus)
+    TextView textViewStatus;
+
+    @InjectView(R.id.textViewHumidity)
+    TextView textViewHumidity;
+
+    @InjectView(R.id.textViewNoInfo)
+    TextView textViewNoInfo;
+
+    @InjectView(R.id.lastDataContainer)
+    LinearLayout lastDataContainer;
+
     @OnClick(R.id.button)
     public void buttonClicked() {
         getUpdatedSensorInfo(mTelephoneNumber);
@@ -48,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ButterKnife.inject(this);
+
+        lastDataContainer.setVisibility(View.GONE);
+
         Intent intent = getIntent();
         selectedId = intent.getIntExtra(SensorSelectorActivity.EXTRA_SELECTED_ID, 0);
 
@@ -55,12 +83,19 @@ public class MainActivity extends AppCompatActivity {
 
         mTelephoneNumber = sensor.telephoneNumber;
 
+        textViewTelephone.setText(mTelephoneNumber);
+
         List<Temperature> temperatures = getTemperatureList(mTelephoneNumber);
-        if (temperatures != null) {
-            //
+        if (temperatures != null && !temperatures.isEmpty()) {
+            lastDataContainer.setVisibility(View.VISIBLE);
+            textViewNoInfo.setVisibility(View.GONE);
+            Temperature temperature = temperatures.get(temperatures.size() - 1);
+
+            textViewLastKnownTemp.setText(String.valueOf(temperature.tempInFahrenheit));
+            textViewStatus.setText(temperature.status);
+            textViewHumidity.setText(String.valueOf(temperature.humidity) + "%");
         }
 
-        ButterKnife.inject(this);
 
         bus = new AndroidBus();
         bus.register(this);
@@ -72,11 +107,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getUpdatedSensorInfo(String telephoneNumber) {
-        Log.d("SMS send", "sending message to " + telephoneNumber);
-        smsManager.sendTextMessage(telephoneNumber, null, STATUS, null, null);
+        try {
+            Log.d("SMS send", "sending message to " + telephoneNumber);
+            smsManager.sendTextMessage(telephoneNumber, null, STATUS, null, null);
+            Toast.makeText(this, getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, getString(R.string.toast_message_not_send), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
 
+    /**
+     * A sensor is kind of the main object of this app, from this we get temperatures
+     *
+     * @return a sensor list
+     */
     public List<Sensor> getSensors() {
         return new Select().from(Sensor.class).execute();
     }
@@ -119,23 +165,4 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
     }
-
-
-    public List<Sensor> getTermocelContact() {
-        return new Select().from(Sensor.class).executeSingle();
-    }
-
-    private void sendSMS() {
-        try {
-            String sms = "S";
-            String contact1 = "+526251048275";
-            String contact2 = "+526143032079";
-
-            smsManager.sendTextMessage(contact2, null, sms, null, null);
-        } catch (Exception e) {
-            Log.e("thing", "errorr", e);
-        }
-    }
-
-
 }

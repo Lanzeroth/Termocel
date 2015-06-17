@@ -14,12 +14,28 @@ public class Temperature extends Model {
     public String number;
 
     @Column
+    public String micrologId;
+
+    @Column
+    public String status;
+
+    @Column
     public double tempInFahrenheit;
 
+    @Column
+    public double humidity;
 
-    public Temperature(String number, double tempInFahrenheit) {
+    @Column
+    public long timestamp;
+
+
+    public Temperature(String number, String micrologId, String status, double tempInFahrenheit, double humidity, long timestamp) {
         this.number = number;
+        this.micrologId = micrologId;
+        this.status = status;
         this.tempInFahrenheit = tempInFahrenheit;
+        this.humidity = humidity;
+        this.timestamp = timestamp;
     }
 
     public Temperature() {

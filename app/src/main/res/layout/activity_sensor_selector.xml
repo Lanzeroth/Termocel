@@ -42,7 +42,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/editTextNewPhoneNumber"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:phoneNumber="true" />
     </LinearLayout>
 
     <LinearLayout

@@ -9,18 +9,88 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar" />
+        android:layout_below="@id/toolbar">
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="83dp"
-        android:text="SendSMS" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewTelephone"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textIsSelectable="false"
+            android:layout_margin="30dp" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textViewTelephone"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/lastDataContainer"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ultima temperatura conocida:"
+                android:id="@+id/textView" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewLastKnownTemp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estatus:"
+                android:id="@+id/textView7" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewStatus" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Humedad Relativa:"
+                android:id="@+id/textView9" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewHumidity" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/main_no_info"
+            android:id="@+id/textViewNoInfo"
+            android:layout_below="@+id/textViewTelephone"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="44dp"
+            android:padding="10dp" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="131dp"
+            android:text="@string/main_refresh_state_button"
+            android:layout_below="@+id/textViewTelephone"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/grey_100"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
+    </RelativeLayout>
 
 </RelativeLayout>
