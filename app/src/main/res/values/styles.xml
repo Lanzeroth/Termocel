@@ -10,5 +10,24 @@
         <item name="color">@android:color/white</item>
     </style>
 
+    <style name="TextViewTitle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/grey_500</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TextViewNormal">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/grey_900</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="ButtonNormal">
+        <item name="android:textColor">@color/grey_50</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+    </style>
 
 </resources>

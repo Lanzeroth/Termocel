@@ -19,6 +19,9 @@ import com.ocr.termocel.model.Temperature;
 import com.ocr.termocel.utilities.AndroidBus;
 import com.squareup.otto.Bus;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -29,6 +32,8 @@ import butterknife.OnClick;
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = MainActivity.class.getSimpleName();
+
+    public static final String EXTRA_TELEPHONE_NUMBER = "EXTRA_TELEPHONE_NUMBER";
 
     public static Bus bus;
 
@@ -58,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
     @InjectView(R.id.textViewNoInfo)
     TextView textViewNoInfo;
+
+    @InjectView(R.id.textViewLastUpdateDate)
+    TextView textViewLastUpdateDate;
 
     @InjectView(R.id.lastDataContainer)
     LinearLayout lastDataContainer;
@@ -91,9 +99,17 @@ public class MainActivity extends AppCompatActivity {
             textViewNoInfo.setVisibility(View.GONE);
             Temperature temperature = temperatures.get(temperatures.size() - 1);
 
-            textViewLastKnownTemp.setText(String.valueOf(temperature.tempInFahrenheit));
+            textViewLastKnownTemp.setText(String.valueOf(temperature.tempInFahrenheit) + " \u00B0 F");
             textViewStatus.setText(temperature.status);
             textViewHumidity.setText(String.valueOf(temperature.humidity) + "%");
+
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTimeInMillis(temperature.timestamp);
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", java.util.Locale.getDefault());
+            simpleDateFormat.setCalendar(calendar);
+
+            textViewLastUpdateDate.setText(simpleDateFormat.format(calendar.getTime()));
         }
 
 
@@ -128,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public List<Temperature> getTemperatureList(String telephoneNumber) {
-        return new Select().from(Temperature.class).where("number = ?", telephoneNumber).execute();
+        return new Select().from(Temperature.class).where("phoneNumber = ?", telephoneNumber).execute();
     }
 
     @Override
@@ -146,8 +162,10 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_telephones) {
+            Intent intent = new Intent(this, TelephoneChangeActivity.class);
+            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

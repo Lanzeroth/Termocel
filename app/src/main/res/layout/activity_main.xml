@@ -1,6 +1,7 @@
 <!-- As the main content view, the view below consumes the entire
          space available using match_parent in both dimensions. -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -28,46 +29,67 @@
             android:layout_margin="30dp" />
 
         <LinearLayout
+            tools:visibility="visible"
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/textViewTelephone"
             android:layout_centerHorizontal="true"
             android:id="@+id/lastDataContainer"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:layout_marginBottom="20dp">
 
             <TextView
+                style="@style/TextViewTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ultima temperatura conocida:"
                 android:id="@+id/textView" />
 
             <TextView
+                style="@style/TextViewNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewLastKnownTemp" />
 
             <TextView
+                style="@style/TextViewTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Estatus:"
                 android:id="@+id/textView7" />
 
             <TextView
+                style="@style/TextViewNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewStatus" />
 
             <TextView
+                style="@style/TextViewTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Humedad Relativa:"
                 android:id="@+id/textView9" />
 
             <TextView
+                style="@style/TextViewNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewHumidity" />
+
+            <TextView
+                style="@style/TextViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha de actualizacion:"
+                android:id="@+id/textView6" />
+
+            <TextView
+                style="@style/TextViewNormal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewLastUpdateDate" />
         </LinearLayout>
 
         <TextView
@@ -78,19 +100,19 @@
             android:layout_below="@+id/textViewTelephone"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="44dp"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:gravity="center" />
 
         <Button
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="131dp"
             android:text="@string/main_refresh_state_button"
-            android:layout_below="@+id/textViewTelephone"
-            android:layout_centerHorizontal="true"
             android:textColor="@color/grey_100"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp" />
+            android:paddingRight="20dp"
+            android:layout_below="@+id/lastDataContainer"
+            android:layout_centerHorizontal="true" />
     </RelativeLayout>
 
 </RelativeLayout>

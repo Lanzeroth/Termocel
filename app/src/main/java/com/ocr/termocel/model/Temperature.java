@@ -11,7 +11,7 @@ import com.activeandroid.annotation.Table;
 public class Temperature extends Model {
 
     @Column
-    public String number;
+    public String phoneNumber;
 
     @Column
     public String micrologId;
@@ -29,8 +29,8 @@ public class Temperature extends Model {
     public long timestamp;
 
 
-    public Temperature(String number, String micrologId, String status, double tempInFahrenheit, double humidity, long timestamp) {
-        this.number = number;
+    public Temperature(String phoneNumber, String micrologId, String status, double tempInFahrenheit, double humidity, long timestamp) {
+        this.phoneNumber = phoneNumber;
         this.micrologId = micrologId;
         this.status = status;
         this.tempInFahrenheit = tempInFahrenheit;
