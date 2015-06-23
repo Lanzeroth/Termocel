@@ -6,8 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -167,22 +165,24 @@ public class TelephoneChangeActivity extends AppCompatActivity {
                         where("sensorNumber = ?", sensorTelephoneNumber).
                         and("phoneIndex = ?", i).
                         executeSingle();
-                switch (i) {
-                    case 0:
-                        tempTelephone.phoneNumber = editTextPhone1.getText().toString();
-                        break;
-                    case 1:
-                        tempTelephone.phoneNumber = editTextPhone2.getText().toString();
-                        break;
-                    case 2:
-                        tempTelephone.phoneNumber = editTextPhone3.getText().toString();
-                        break;
+                if (tempTelephone != null) {
+                    switch (i) {
+                        case 0:
+                            tempTelephone.phoneNumber = editTextPhone1.getText().toString();
+                            break;
+                        case 1:
+                            tempTelephone.phoneNumber = editTextPhone2.getText().toString();
+                            break;
+                        case 2:
+                            tempTelephone.phoneNumber = editTextPhone3.getText().toString();
+                            break;
+                    }
+                    Calendar calendar = Calendar.getInstance();
+                    tempTelephone.date = calendar.getTimeInMillis();
+                    tempTelephone.verified = false;
+                    tempTelephone.save();
+                    Log.d(TAG, "telephone saved to db");
                 }
-                Calendar calendar = Calendar.getInstance();
-                tempTelephone.date = calendar.getTimeInMillis();
-                tempTelephone.verified = false;
-                tempTelephone.save();
-                Log.d(TAG, "telephone saved to db");
             }
 
             sendSMS(i);
@@ -225,29 +225,7 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     }
 
     public List<Telephone> getTelephonesFromDB() {
-        return new Select().from(Telephone.class).orderBy("phoneIndex ASC").execute();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_telephone_change, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        return new Select().from(Telephone.class).where("sensorNumber = ?", sensorTelephoneNumber).orderBy("phoneIndex ASC").execute();
     }
 
     /**

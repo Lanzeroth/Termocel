@@ -3,15 +3,37 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="action_telephones">Telefonos</string>
+    <string name="action_telephones">Teléfonos</string>
+    <string name="action_alerts">Alertas</string>
+
     <string name="title_activity_sensor_selector">SensorSelector</string>
-    <string name="toast_message_send">Mensaje enviado con exito</string>
+    <string name="toast_message_send">Mensaje enviado con éxito</string>
     <string name="toast_message_not_send">Hay un problema enviando el mensaje</string>
-    <string name="main_no_info">No tenemos informacion de este Microlog, por favor presione el boton para adquirir el estado actual.</string>
+    <string name="main_no_info">No tenemos información de este Microlog, por favor presione el botón para adquirir el estado actual.</string>
     <string name="main_refresh_state_button">Actualizar Estado</string>
+
     <string name="title_activity_telephone_change">TelephoneChangeActivity</string>
-    <string name="telephone_update_date">Fecha de actualizacion:</string>
+    <string name="telephone_update_date">Fecha de actualización:</string>
     <string name="telephone_modify">Modificar</string>
-    <string name="telephone_activity_title">Telefonos Guardados</string>
+    <string name="telephone_activity_title">Teléfonos Guardados</string>
     <string name="title_activity_set_points">SetPointsActivity</string>
+    <string name="set_point_1">SetPoint 1 - Atención</string>
+    <string name="set_point_2">SetPoint 2 - Advertencia</string>
+    <string name="set_point_3">SetPoint 3 - Alarma</string>
+    <string name="set_point_4">SetPoint 4 - Alarma</string>
+
+
+    <string name="set_points_title">Reporte de Alarmas</string>
+    <string name="main_last_known_temp">Ultima temperatura conocida:</string>
+    <string name="main_status">Estatus:</string>
+    <string name="main_relative_humidity">Humedad Relativa:</string>
+    <string name="main_update_date">Fecha de actualización:</string>
+    <string name="set_points_microlog_id">Microlog Id</string>
+    <string name="selector_new_contact">Nuevo contacto</string>
+    <string name="selector_telephone_number">Numero de teléfono</string>
+    <string name="selector_id_name">Nombre Identificador</string>
+    <string name="selector_button_save">Guardar</string>
+    <string name="selector_select_contact">Seleccione el contacto</string>
+
+
 </resources>

@@ -43,7 +43,7 @@
                 style="@style/TextViewTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ultima temperatura conocida:"
+                android:text="@string/main_last_known_temp"
                 android:id="@+id/textView" />
 
             <TextView
@@ -56,7 +56,7 @@
                 style="@style/TextViewTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Estatus:"
+                android:text="@string/main_status"
                 android:id="@+id/textView7" />
 
             <TextView
@@ -69,7 +69,7 @@
                 style="@style/TextViewTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Humedad Relativa:"
+                android:text="@string/main_relative_humidity"
                 android:id="@+id/textView9" />
 
             <TextView
@@ -82,7 +82,7 @@
                 style="@style/TextViewTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fecha de actualizacion:"
+                android:text="@string/main_update_date"
                 android:id="@+id/textView6" />
 
             <TextView
@@ -104,6 +104,7 @@
             android:gravity="center" />
 
         <Button
+            style="@style/ButtonNormal"
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

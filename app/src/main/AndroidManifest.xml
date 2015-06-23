@@ -26,16 +26,21 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" />
-
+        <activity
+            android:name=".TelephoneChangeActivity"
+            android:label="@string/title_activity_telephone_change" />
+        <activity
+            android:name=".SetPointsActivity"
+            android:label="@string/title_activity_set_points" />
         <meta-data
             android:name="AA_DB_NAME"
             android:value="termocel.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="6" />
+            android:value="7" />
         <meta-data
             android:name="AA_MODELS"
-            android:value="com.ocr.termocel.model.Sensor, com.ocr.termocel.model.Temperature, com.ocr.termocel.model.Telephone" />
+            android:value="com.ocr.termocel.model.Sensor, com.ocr.termocel.model.Temperature, com.ocr.termocel.model.Telephone, com.ocr.termocel.model.SetPoint" />
 
         <receiver
             android:name=".receivers.MessageReceiver"
@@ -44,13 +49,6 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
-
-        <activity
-            android:name=".TelephoneChangeActivity"
-            android:label="@string/title_activity_telephone_change"></activity>
-        <activity
-            android:name=".SetPointsActivity"
-            android:label="@string/title_activity_set_points"></activity>
     </application>
 
 </manifest>

@@ -166,6 +166,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, TelephoneChangeActivity.class);
             intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
             startActivity(intent);
+        } else if (id == R.id.action_alerts) {
+            Intent intent = new Intent(this, SetPointsActivity.class);
+            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

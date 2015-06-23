@@ -5,4 +5,9 @@
         android:id="@+id/action_telephones"
         android:title="@string/action_telephones"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item
+        android:id="@+id/action_alerts"
+        android:title="@string/action_alerts"
+        android:orderInCategory="200"
+        app:showAsAction="never" />
 </menu>

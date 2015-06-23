@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.activeandroid.query.Select;
 import com.ocr.termocel.custom.recyclerView.CustomAdapter;
@@ -43,6 +44,18 @@ public class SensorSelectorActivity extends AppCompatActivity {
     @InjectView(R.id.my_recycler_view)
     EmptyRecyclerView mRecyclerView;
 
+    @InjectView(R.id.newContactContainer)
+    LinearLayout newContactContainer;
+
+    @OnClick(R.id.buttonNewContact)
+    public void newContactClicked() {
+        if (newContactContainer.getVisibility() == View.VISIBLE) {
+            newContactContainer.setVisibility(View.GONE);
+        } else if (newContactContainer.getVisibility() == View.GONE) {
+            newContactContainer.setVisibility(View.VISIBLE);
+        }
+    }
+
     @OnClick(R.id.buttonSave)
     public void onButtonSaveClicked() {
         if (!editTextNewPhoneNumber.getText().toString().equalsIgnoreCase("")) {
@@ -63,6 +76,8 @@ public class SensorSelectorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sensor_selector);
 
         ButterKnife.inject(this);
+
+        newContactContainer.setVisibility(View.GONE);
 
         bus = new AndroidBus();
         bus.register(this);
