@@ -47,8 +47,13 @@ public class MessageReceiver extends BroadcastReceiver {
         String relativeHumidityString = spitedMessage[8];
         Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
 
+        String temporalAddress = smsMessage.getOriginatingAddress();
+        if (temporalAddress.length() > 10) {
+            temporalAddress = smsMessage.getOriginatingAddress().substring(3, 13);
+        }
+
         Temperature temperature = new Temperature(
-                smsMessage.getOriginatingAddress(),
+                temporalAddress,
                 micrologId,
                 stateString,
                 Double.parseDouble(temperatureString),

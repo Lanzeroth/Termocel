@@ -201,9 +201,7 @@ public class SetPointsActivity extends AppCompatActivity {
     private String formatMicrologId() {
         String tempId = editTextMicrologId.getText().toString();
         int intId = Integer.parseInt(tempId);
-        if (intId < 10) {
-            tempId = "0" + tempId;
-        }
+
         return tempId;
     }
 
