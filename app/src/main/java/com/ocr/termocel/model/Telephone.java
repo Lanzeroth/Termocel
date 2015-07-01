@@ -11,7 +11,7 @@ import com.activeandroid.annotation.Table;
 public class Telephone extends Model {
 
     @Column
-    public String sensorNumber;
+    public String sensorPhoneNumber;
 
     @Column
     public int phoneIndex;
@@ -25,8 +25,8 @@ public class Telephone extends Model {
     @Column
     public boolean verified;
 
-    public Telephone(String sensorNumber, int phoneIndex, String phoneNumber, long date, boolean verified) {
-        this.sensorNumber = sensorNumber;
+    public Telephone(String sensorPhoneNumber, int phoneIndex, String phoneNumber, long date, boolean verified) {
+        this.sensorPhoneNumber = sensorPhoneNumber;
         this.phoneIndex = phoneIndex;
         this.phoneNumber = phoneNumber;
         this.date = date;

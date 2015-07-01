@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import com.activeandroid.query.Select;
+import com.ocr.termocel.MainActivity;
+import com.ocr.termocel.SensorSelectorActivity;
+import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
 
 /**
@@ -15,6 +19,8 @@ import com.ocr.termocel.model.Temperature;
 public class MessageReceiver extends BroadcastReceiver {
     private final String TAG = MessageReceiver.class.getSimpleName();
 
+    public static final String EXTRA_PHONE_NUMBER = "EXTRA_PHONE_NUMBER";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle pudsBundle = intent.getExtras();
@@ -22,13 +28,23 @@ public class MessageReceiver extends BroadcastReceiver {
         SmsMessage messages = SmsMessage.createFromPdu((byte[]) pdus[0]);
         Log.i(TAG, messages.getMessageBody());
         if (messages.getMessageBody().contains("MICROLOG")) {
-            formatMessage(messages);
             Log.i(TAG, "tried to abort");
             abortBroadcast();
+            String phoneNumber = formatMessage(messages);
+            startNewActivityOnTop(context, phoneNumber);
         }
     }
 
-    private void formatMessage(SmsMessage smsMessage) {
+    private void startNewActivityOnTop(Context context, String phoneNumber) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(SensorSelectorActivity.EXTRA_COMES_FROM_RECEIVER, true);
+        intent.putExtra(EXTRA_PHONE_NUMBER, phoneNumber);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    private String formatMessage(SmsMessage smsMessage) {
         String sms = smsMessage.getMessageBody();
         String[] spitedMessage = sms.split(" ");
         String micrologId = spitedMessage[1].substring(1, 3);
@@ -52,6 +68,14 @@ public class MessageReceiver extends BroadcastReceiver {
             temporalAddress = smsMessage.getOriginatingAddress().substring(3, 13);
         }
 
+        saveTemperature(smsMessage, micrologId, stateString, temperatureString, relativeHumidityString, temporalAddress);
+
+        saveMicrologID(temporalAddress, micrologId, stateString);
+
+        return temporalAddress;
+    }
+
+    private void saveTemperature(SmsMessage smsMessage, String micrologId, String stateString, String temperatureString, String relativeHumidityString, String temporalAddress) {
         Temperature temperature = new Temperature(
                 temporalAddress,
                 micrologId,
@@ -61,5 +85,18 @@ public class MessageReceiver extends BroadcastReceiver {
                 smsMessage.getTimestampMillis()
         );
         temperature.save();
+    }
+
+    private void saveMicrologID(String temporalAddress, String micrologId, String stateString) {
+        Microlog microlog = new Select().
+                from(Microlog.class).
+                where("sensorPhoneNumber = ?", temporalAddress).
+                executeSingle();
+
+        if (microlog != null) {
+            microlog.sensorId = micrologId;
+            microlog.lastState = stateString;
+            microlog.save();
+        }
     }
 }

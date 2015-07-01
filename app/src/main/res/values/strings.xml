@@ -30,10 +30,19 @@
     <string name="main_update_date">Fecha de actualización:</string>
     <string name="set_points_microlog_id">Microlog Id</string>
     <string name="selector_new_contact">Nuevo contacto</string>
+    <string name="selector_existing_contact">Seleccionar contacto</string>
     <string name="selector_telephone_number">Numero de teléfono</string>
     <string name="selector_id_name">Nombre Identificador</string>
     <string name="selector_button_save">Guardar</string>
     <string name="selector_select_contact">Seleccione el contacto</string>
+
+
+    <string name="dialog_yes">Enviar</string>
+    <string name="dialog_no">Cancelar</string>
+    <string name="dialog_title_state">Obtener estado actual</string>
+    <string name="dialog_message_confirm_sms">Esta acción enviará un SMS</string>
+    <string name="text_100_F">100°</string>
+    <string name="text_0F">0°</string>
 
 
 </resources>

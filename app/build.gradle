@@ -21,9 +21,9 @@ android {
 
 repositories {
     maven { url 'http://clinker.47deg.com/nexus/content/groups/public' }
-    maven {
-        url "https://repo.commonsware.com.s3.amazonaws.com"
-    }
+    maven { url "https://repo.commonsware.com.s3.amazonaws.com" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+
 }
 
 dependencies {
@@ -31,8 +31,8 @@ dependencies {
     // Support Libraries
     compile 'com.android.support:support-v4:22.1.1'
     compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'com.android.support:cardview-v7:21.0.3'
-    compile 'com.android.support:recyclerview-v7:21.0.3'
+    compile 'com.android.support:cardview-v7:22.1.1'
+    compile 'com.android.support:recyclerview-v7:22.1.1'
     // View "injection" Library
     compile 'com.jakewharton:butterknife:6.0.0'
     // ActiveAndroid ORM (Object Relational Mapper)

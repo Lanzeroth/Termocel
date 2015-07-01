@@ -152,7 +152,7 @@ public class SetPointsActivity extends AppCompatActivity {
     private void setPointClick(int i) {
         SetPoint setPoint = new Select().
                 from(SetPoint.class).
-                where("phoneNumber = ?", sensorTelephoneNumber).
+                where("sensorPhoneNumber = ?", sensorTelephoneNumber).
                 and("setPointNumber = ?", i).
                 executeSingle();
         if (setPoint != null) {
@@ -206,7 +206,7 @@ public class SetPointsActivity extends AppCompatActivity {
     }
 
     public List<Telephone> getSetPointsFromDB() {
-        return new Select().from(SetPoint.class).where("phoneNumber = ?", sensorTelephoneNumber).orderBy("setPointNumber ASC").execute();
+        return new Select().from(SetPoint.class).where("sensorPhoneNumber = ?", sensorTelephoneNumber).orderBy("setPointNumber ASC").execute();
     }
 
 

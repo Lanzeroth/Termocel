@@ -25,7 +25,7 @@ import android.widget.TextView;
 import com.ocr.termocel.R;
 import com.ocr.termocel.SensorSelectorActivity;
 import com.ocr.termocel.events.SensorClickedEvent;
-import com.ocr.termocel.model.Sensor;
+import com.ocr.termocel.model.Microlog;
 import com.orhanobut.logger.Logger;
 
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.List;
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
     private static final String TAG = "CustomAdapter";
 
-    private List<Sensor> mDataSet;
+    private List<Microlog> mDataSet;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
 
@@ -76,7 +76,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
      *
      * @param dataSet a list with markers
      */
-    public CustomAdapter(List<Sensor> dataSet) {
+    public CustomAdapter(List<Microlog> dataSet) {
         mDataSet = dataSet;
     }
 
@@ -101,7 +101,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
         viewHolder.getTextViewName().setText(mDataSet.get(position).name);
-        viewHolder.getTextViewNumber().setText(mDataSet.get(position).telephoneNumber);
+        viewHolder.getTextViewNumber().setText(mDataSet.get(position).sensorPhoneNumber);
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 

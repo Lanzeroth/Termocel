@@ -162,7 +162,7 @@ public class TelephoneChangeActivity extends AppCompatActivity {
             if (!consultMode) {
                 Telephone tempTelephone = new Select().
                         from(Telephone.class).
-                        where("sensorNumber = ?", sensorTelephoneNumber).
+                        where("sensorPhoneNumber = ?", sensorTelephoneNumber).
                         and("phoneIndex = ?", i).
                         executeSingle();
                 if (tempTelephone != null) {
@@ -225,7 +225,7 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     }
 
     public List<Telephone> getTelephonesFromDB() {
-        return new Select().from(Telephone.class).where("sensorNumber = ?", sensorTelephoneNumber).orderBy("phoneIndex ASC").execute();
+        return new Select().from(Telephone.class).where("sensorPhoneNumber = ?", sensorTelephoneNumber).orderBy("phoneIndex ASC").execute();
     }
 
     /**
