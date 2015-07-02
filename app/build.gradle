@@ -21,8 +21,8 @@ android {
 
 repositories {
     maven { url 'http://clinker.47deg.com/nexus/content/groups/public' }
-    maven { url "https://repo.commonsware.com.s3.amazonaws.com" }
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url 'https://repo.commonsware.com.s3.amazonaws.com' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 
 }
 

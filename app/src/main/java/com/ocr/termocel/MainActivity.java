@@ -2,11 +2,12 @@ package com.ocr.termocel;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -180,15 +181,32 @@ public class MainActivity extends AppCompatActivity {
      * assigns this gradient to the seekBar and prevents it from capturing on touch events
      */
     private void drawThermometer() {
-        LinearGradient test = new LinearGradient(0.f, 0.f, 300.f, 0.0f,
-
-                new int[]{0xFFe53935, 0xFFff9800, 0xFFfbc02d, 0xFF388e3C},
-                null, Shader.TileMode.CLAMP);
-        ShapeDrawable shape = new ShapeDrawable(new RectShape());
-        shape.getPaint().setShader(test);
-
-        seekBarThermometer.setProgressDrawable((Drawable) shape);
+//        LinearGradient test = new LinearGradient(0.f, 0.f, 300.f, 0.0f,
+//                new int[]{0xFFe53935, 0xFFff9800, 0xFFfbc02d, 0xFF388e3C},
+//                null, Shader.TileMode.CLAMP);
+//        ShapeDrawable shape = new ShapeDrawable(new RectShape());
+//        shape.getPaint().setShader(test);
+//
+//        seekBarThermometer.setProgressDrawable((Drawable) shape);
         seekBarThermometer.setClickable(false);
+        seekBarThermometer.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.d(TAG, "PROGRESS CHANGED " + progress);
+                seekBarThermometer.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(progress)));
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         seekBarThermometer.setFocusable(false);
         seekBarThermometer.setOnTouchListener(new View.OnTouchListener() {
                                                   @Override
@@ -197,6 +215,33 @@ public class MainActivity extends AppCompatActivity {
                                                   }
                                               }
         );
+    }
+
+    /**
+     * Writes text on the Thumb drawable
+     *
+     * @param drawableId
+     * @param text
+     * @return
+     */
+    public BitmapDrawable writeOnDrawable(int drawableId, String text) {
+
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId).copy(Bitmap.Config.ARGB_8888, true);
+
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(40);
+
+        Canvas canvas = new Canvas(bm);
+        canvas.save();
+        canvas.rotate(90f);
+
+        canvas.drawText(text, 5, -15, paint);
+        canvas.restore();
+
+
+        return new BitmapDrawable(getResources(), bm);
     }
 
     public void getUpdatedSensorInfo(String telephoneNumber) {
