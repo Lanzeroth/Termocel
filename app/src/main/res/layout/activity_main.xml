@@ -49,6 +49,8 @@
             android:layout_below="@+id/textViewTelephone"
             android:layout_centerHorizontal="true"
             android:gravity="center_vertical"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:id="@+id/lastDataContainer">
 
             <RelativeLayout
@@ -77,7 +79,7 @@
             </RelativeLayout>
 
             <com.ocr.termocel.custom.widget.VerticalSeekBar
-                android:id="@+id/seekbar_font"
+                android:id="@+id/seekBarThermometer"
                 android:layout_width="wrap_content"
                 android:layout_height="250dp"
                 android:layout_below="@+id/textViewContactName"
@@ -96,8 +98,7 @@
                 android:layout_below="@+id/textViewTelephone"
                 android:layout_centerHorizontal="true"
                 android:orientation="vertical"
-                android:visibility="gone"
-                tools:visibility="visible"
+
                 android:layout_marginLeft="10dp">
 
                 <TextView

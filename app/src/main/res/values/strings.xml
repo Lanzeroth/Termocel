@@ -40,6 +40,9 @@
     <string name="dialog_yes">Enviar</string>
     <string name="dialog_no">Cancelar</string>
     <string name="dialog_title_state">Obtener estado actual</string>
+    <string name="dialog_title_set_point">Cambiar Set Point</string>
+    <string name="dialog_title_telephone">Cambiar telefono</string>
+    <string name="dialog_title_telephone_consult">Consultar telefono</string>
     <string name="dialog_message_confirm_sms">Esta acción enviará un SMS</string>
     <string name="text_100_F">100°F</string>
     <string name="text_0F">0°F</string>

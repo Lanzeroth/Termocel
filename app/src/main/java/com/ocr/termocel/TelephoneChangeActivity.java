@@ -1,7 +1,9 @@
 package com.ocr.termocel;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
@@ -52,17 +54,35 @@ public class TelephoneChangeActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonModify1)
     public void modifyButtonClicked1() {
-        saveToDB(0);
+        String dialogTitle;
+        if (consultMode) {
+            dialogTitle = getString(R.string.dialog_title_telephone_consult);
+        } else {
+            dialogTitle = getString(R.string.dialog_title_telephone);
+        }
+        showAlertDialog(dialogTitle + " 1", getString(R.string.dialog_message_confirm_sms), 0);
     }
 
     @OnClick(R.id.buttonModify2)
     public void modifyButtonClicked2() {
-        saveToDB(1);
+        String dialogTitle;
+        if (consultMode) {
+            dialogTitle = getString(R.string.dialog_title_telephone_consult);
+        } else {
+            dialogTitle = getString(R.string.dialog_title_telephone);
+        }
+        showAlertDialog(dialogTitle + " 2", getString(R.string.dialog_message_confirm_sms), 1);
     }
 
     @OnClick(R.id.buttonModify3)
     public void modifyButtonClicked3() {
-        saveToDB(2);
+        String dialogTitle;
+        if (consultMode) {
+            dialogTitle = getString(R.string.dialog_title_telephone_consult);
+        } else {
+            dialogTitle = getString(R.string.dialog_title_telephone);
+        }
+        showAlertDialog(dialogTitle + " 3", getString(R.string.dialog_message_confirm_sms), 2);
     }
 
     @InjectView(R.id.textViewUpdateDate1)
@@ -150,6 +170,28 @@ public class TelephoneChangeActivity extends AppCompatActivity {
             }
         }
     }
+
+    /**
+     * Show the alert dialog and then clicks on the index
+     *
+     * @param title         title to show
+     * @param messageToShow message
+     * @param indexClicked  for the saveToDB
+     */
+    private void showAlertDialog(String title, String messageToShow, final int indexClicked) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(messageToShow)
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.dialog_yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        saveToDB(indexClicked);
+                    }
+                })
+                .setNegativeButton(getString(R.string.dialog_no), null)
+                .show();
+    }
+
 
     /**
      * If is not on consult mode we try to save the new phone to an existing database index and

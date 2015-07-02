@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     @InjectView(R.id.lastDataContainer)
     LinearLayout lastDataContainer;
 
-    @InjectView(R.id.seekbar_font)
+    @InjectView(R.id.seekBarThermometer)
     SeekBar seekBarThermometer;
 
     @OnClick(R.id.button)

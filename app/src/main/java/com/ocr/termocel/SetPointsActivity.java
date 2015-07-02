@@ -1,7 +1,9 @@
 package com.ocr.termocel;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
@@ -49,17 +51,17 @@ public class SetPointsActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonSetPoint1)
     public void setPointClicked1() {
-        setPointClick(0);
+        showAlertDialog(getString(R.string.dialog_title_set_point) + " 1", getString(R.string.dialog_message_confirm_sms), 0);
     }
 
     @OnClick(R.id.buttonSetPoint2)
     public void setPointClicked2() {
-        setPointClick(1);
+        showAlertDialog(getString(R.string.dialog_title_set_point) + " 2", getString(R.string.dialog_message_confirm_sms), 1);
     }
 
     @OnClick(R.id.buttonSetPoint3)
     public void setPointClicked3() {
-        setPointClick(2);
+        showAlertDialog(getString(R.string.dialog_title_set_point) + " 3", getString(R.string.dialog_message_confirm_sms), 2);
     }
 
 
@@ -92,7 +94,7 @@ public class SetPointsActivity extends AppCompatActivity {
         editTextSetPoint1.setSelectAllOnFocus(true);
         editTextSetPoint2.setText("33");
         editTextSetPoint2.setSelectAllOnFocus(true);
-        editTextSetPoint3.setText("38");
+        editTextSetPoint3.setText("28");
         editTextSetPoint3.setSelectAllOnFocus(true);
 
 
@@ -147,6 +149,27 @@ public class SetPointsActivity extends AppCompatActivity {
 
         /** toolBar **/
         setUpToolBar();
+    }
+
+    /**
+     * Show the alert dialog and then clicks on the index
+     *
+     * @param title         title to show
+     * @param messageToShow message
+     * @param indexClicked  for the setPointClick
+     */
+    private void showAlertDialog(String title, String messageToShow, final int indexClicked) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(messageToShow)
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.dialog_yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        setPointClick(indexClicked);
+                    }
+                })
+                .setNegativeButton(getString(R.string.dialog_no), null)
+                .show();
     }
 
     private void setPointClick(int i) {
