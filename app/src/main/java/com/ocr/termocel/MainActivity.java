@@ -2,12 +2,15 @@ package com.ocr.termocel;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,11 +26,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
 import com.ocr.termocel.receivers.MessageReceiver;
 import com.ocr.termocel.utilities.AndroidBus;
+import com.orhanobut.logger.Logger;
 import com.squareup.otto.Bus;
 
 import java.text.SimpleDateFormat;
@@ -112,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
         drawThermometer();
 
+
         lastDataContainer.setVisibility(View.GONE);
 
         Intent intent = getIntent();
@@ -126,10 +133,23 @@ public class MainActivity extends AppCompatActivity {
             mTelephoneNumber = microlog.sensorPhoneNumber;
             mContactName = microlog.name;
         }
+        new SearchForSMSHistory().execute(mTelephoneNumber);
 
         textViewTelephone.setText(mTelephoneNumber);
         textViewContactName.setText(mContactName);
 
+
+
+        bus = new AndroidBus();
+        bus.register(this);
+
+        smsManager = SmsManager.getDefault();
+
+        /** toolBar **/
+        setUpToolBar();
+    }
+
+    private void getExistingTemperaturesForMain() {
         List<Temperature> temperatures = getTemperatureList(mTelephoneNumber);
         if (temperatures != null && !temperatures.isEmpty()) {
             lastDataContainer.setVisibility(View.VISIBLE);
@@ -165,15 +185,6 @@ public class MainActivity extends AppCompatActivity {
 
             textViewLastUpdateDate.setText(simpleDateFormat.format(calendar.getTime()));
         }
-
-
-        bus = new AndroidBus();
-        bus.register(this);
-
-        smsManager = SmsManager.getDefault();
-
-        /** toolBar **/
-        setUpToolBar();
     }
 
     /**
@@ -270,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public List<Temperature> getTemperatureList(String telephoneNumber) {
-        return new Select().from(Temperature.class).where("sensorPhoneNumber = ?", telephoneNumber).execute();
+        return new Select().from(Temperature.class).where("sensorPhoneNumber = ?", telephoneNumber).orderBy("timestamp ASC").execute();
     }
 
     @Override
@@ -296,6 +307,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, SetPointsActivity.class);
             intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
             startActivity(intent);
+        } else if (id == R.id.action_history) {
+            Intent intent = new Intent(this, HistoryActivity.class);
+            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -312,5 +327,114 @@ public class MainActivity extends AppCompatActivity {
         // enabling action bar app icon and behaving it as toggle button
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+    }
+
+    /**
+     * AsyncTask for getting the sms history from the phone and get it into a local database
+     */
+    private class SearchForSMSHistory extends AsyncTask<String, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            String telephoneToSearch = strings[0];
+
+            Uri uri = Uri.parse("content://sms");
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            eraseTemperaturesFromLocalDB();
+
+            if (cursor.moveToFirst()) {
+                for (int i = 0; i < cursor.getCount(); i++) {
+                    String number = cursor.getString(cursor.getColumnIndexOrThrow("address"));
+                    if (number.length() > 10) {
+                        number = number.substring(number.length() - 10);
+                    }
+                    if (number.equalsIgnoreCase(telephoneToSearch)) {
+                        String body = cursor.getString(cursor.getColumnIndexOrThrow("body"));
+                        String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                        String type = cursor.getString(cursor.getColumnIndexOrThrow("type"));
+                        if (body.contains("MICROLOG") && type.equalsIgnoreCase("1")) {
+                            formatSMSMessage(telephoneToSearch, body, date);
+                        }
+                    }
+                    cursor.moveToNext();
+                }
+            }
+            cursor.close();
+            return null;
+        }
+
+        private void formatSMSMessage(String telephoneToSearch, String sms, String date) {
+            String[] spitedMessage = sms.split(" ");
+            String micrologId = spitedMessage[1].substring(1, 3);
+            String stateTemp = spitedMessage[2].substring(0, 3);
+            String stateString = "";
+            if (stateTemp.equalsIgnoreCase("NOR")) {
+                stateString = "Normal";
+            } else if (stateTemp.equalsIgnoreCase("ATN")) {
+                stateString = "Atencion";
+            } else if (stateTemp.equalsIgnoreCase("ADV")) {
+                stateString = "Advertencia";
+            } else if (stateTemp.equalsIgnoreCase("ALA")) {
+                stateString = "Alarma";
+            }
+            String temperatureString = spitedMessage[5].substring(0, 2);
+            String relativeHumidityString = spitedMessage[8];
+            Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
+
+
+            saveTemperature(micrologId, stateString, temperatureString, relativeHumidityString, telephoneToSearch, Long.parseLong(date));
+
+        }
+
+        private void saveTemperature(String micrologId, String stateString, String temperatureString, String relativeHumidityString, String temporalAddress, long date) {
+            ActiveAndroid.beginTransaction();
+            try {
+                Temperature temperature = new Temperature(
+                        temporalAddress,
+                        micrologId,
+                        stateString,
+                        Double.parseDouble(temperatureString),
+                        Double.parseDouble(relativeHumidityString),
+                        date
+                );
+                temperature.save();
+                ActiveAndroid.setTransactionSuccessful();
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            } finally {
+                ActiveAndroid.endTransaction();
+            }
+        }
+
+        /**
+         * Database erase
+         * Erases the db so we don't have to check if the reading already exists and don't put duplicates
+         */
+        private void eraseTemperaturesFromLocalDB() {
+            List<Temperature> tempList = new Select().from(Temperature.class).execute();
+            if (tempList != null && tempList.size() > 0) {
+                ActiveAndroid.beginTransaction();
+                try {
+                    new Delete().from(Temperature.class).execute();
+                    ActiveAndroid.setTransactionSuccessful();
+                } catch (Exception e) {
+                    Logger.e(e, "error deleting existing db");
+                } finally {
+                    ActiveAndroid.endTransaction();
+                }
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            getExistingTemperaturesForMain();
+
+        }
     }
 }

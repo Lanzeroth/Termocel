@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
 
 
     <application
@@ -34,6 +35,7 @@
         <activity
             android:name=".SetPointsActivity"
             android:label="@string/title_activity_set_points" />
+
         <meta-data
             android:name="AA_DB_NAME"
             android:value="termocel.db" />
@@ -51,6 +53,10 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".HistoryActivity"
+            android:label="@string/title_activity_history"></activity>
     </application>
 
 </manifest>

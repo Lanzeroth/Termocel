@@ -10,4 +10,9 @@
         android:title="@string/action_alerts"
         android:orderInCategory="200"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_history"
+        android:title="@string/action_history"
+        android:orderInCategory="200"
+        app:showAsAction="never" />
 </menu>

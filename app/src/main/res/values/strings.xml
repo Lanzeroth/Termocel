@@ -5,6 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_telephones">Teléfonos</string>
     <string name="action_alerts">Alertas</string>
+    <string name="action_history">Historial</string>
 
     <string name="title_activity_sensor_selector">SensorSelector</string>
     <string name="toast_message_send">Mensaje enviado con éxito</string>
@@ -46,6 +47,14 @@
     <string name="dialog_message_confirm_sms">Esta acción enviará un SMS</string>
     <string name="text_100_F">100°F</string>
     <string name="text_0F">0°F</string>
+
+
+    <string name="title_activity_history">HistoryActivity</string>
+    <string name="history_activity_title">Historial</string>
+    <string name="text_history_status">Estado</string>
+    <string name="text_history_temp">Temp F</string>
+    <string name="text_history_humidity">Humedad</string>
+    <string name="text_history_date">Fecha</string>
 
 
 </resources>
