@@ -106,6 +106,7 @@ public class HistoryActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(getString(R.string.history_activity_title));
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         // enabling action bar app icon and behaving it as toggle button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
     }

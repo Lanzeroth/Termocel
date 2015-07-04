@@ -12,8 +12,9 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 
 import com.activeandroid.query.Select;
+import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.SetPoint;
-import com.ocr.termocel.model.Telephone;
+import com.ocr.termocel.receivers.MessageReceiver;
 
 import java.util.Calendar;
 import java.util.List;
@@ -25,9 +26,6 @@ import butterknife.OnClick;
 public class SetPointsActivity extends AppCompatActivity {
 
     private final String TAG = SetPointsActivity.class.getSimpleName();
-
-    private final int MAX_TEMP = 100;
-    private final int MIN_TEMP = 0;
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -48,6 +46,22 @@ public class SetPointsActivity extends AppCompatActivity {
     EditText editTextSetPoint2;
     @InjectView(R.id.editTextSetPoint3)
     EditText editTextSetPoint3;
+
+    @OnClick(R.id.buttonSetPointAll)
+    public void setAllSetPointsClicked() {
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.dialog_title_get_all_set_points))
+                .setMessage(getString(R.string.dialog_message_confirm_sms))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.dialog_yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + "X01S?2", null, null);
+                    }
+                })
+                .setNegativeButton(getString(R.string.dialog_no), null)
+                .show();
+
+    }
 
     @OnClick(R.id.buttonSetPoint1)
     public void setPointClicked1() {
@@ -71,30 +85,68 @@ public class SetPointsActivity extends AppCompatActivity {
 
     private List<SetPoint> mSetPointList;
 
+    private Microlog mMicrolog;
 
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_points);
         ButterKnife.inject(this);
 
+        editTextMicrologId.setEnabled(false);
+
         Intent intent = getIntent();
         sensorTelephoneNumber = intent.getStringExtra(MainActivity.EXTRA_TELEPHONE_NUMBER);
-
+        if (sensorTelephoneNumber == null || sensorTelephoneNumber.isEmpty()) {
+            sensorTelephoneNumber = intent.getStringExtra(MessageReceiver.EXTRA_PHONE_NUMBER);
+        }
         smsManager = SmsManager.getDefault();
 
-        editTextMicrologId.setText("01");
-        editTextMicrologId.setSelectAllOnFocus(true);
+        /** toolBar **/
+        setUpToolBar();
 
-        seekBarSetPoint1.setProgress(36);
-        seekBarSetPoint2.setProgress(33);
-        seekBarSetPoint3.setProgress(28);
 
-        editTextSetPoint1.setText("36");
+        drawSetPoints();
+
+
+    }
+
+    /**
+     * Handles the setpoints drawing, is separated cause it will be called when refreshing
+     */
+    private void drawSetPoints() {
+        mMicrolog = getMicrolog();
+
+
+        if (!mMicrolog.sensorId.equalsIgnoreCase("")) {
+            editTextMicrologId.setText(mMicrolog.sensorId);
+        } else {
+            editTextMicrologId.setText("00");
+        }
+
+        mSetPointList = getSetPointsFromDB();
+
+        if (mSetPointList != null && !mSetPointList.isEmpty()) {
+            seekBarSetPoint1.setProgress((int) mSetPointList.get(0).tempInFahrenheit);
+            seekBarSetPoint2.setProgress((int) mSetPointList.get(1).tempInFahrenheit);
+            seekBarSetPoint3.setProgress((int) mSetPointList.get(2).tempInFahrenheit);
+
+            editTextSetPoint1.setText(String.valueOf(mSetPointList.get(0).tempInFahrenheit));
+            editTextSetPoint2.setText(String.valueOf(mSetPointList.get(1).tempInFahrenheit));
+            editTextSetPoint3.setText(String.valueOf(mSetPointList.get(2).tempInFahrenheit));
+        } else {
+            seekBarSetPoint1.setProgress(36);
+            seekBarSetPoint2.setProgress(33);
+            seekBarSetPoint3.setProgress(28);
+
+            editTextSetPoint1.setText("36");
+            editTextSetPoint2.setText("33");
+            editTextSetPoint3.setText("28");
+        }
+
         editTextSetPoint1.setSelectAllOnFocus(true);
-        editTextSetPoint2.setText("33");
         editTextSetPoint2.setSelectAllOnFocus(true);
-        editTextSetPoint3.setText("28");
         editTextSetPoint3.setSelectAllOnFocus(true);
 
 
@@ -146,9 +198,10 @@ public class SetPointsActivity extends AppCompatActivity {
 
             }
         });
+    }
 
-        /** toolBar **/
-        setUpToolBar();
+    private Microlog getMicrolog() {
+        return new Select().from(Microlog.class).where("sensorPhoneNumber = ?", sensorTelephoneNumber).executeSingle();
     }
 
     /**
@@ -203,7 +256,7 @@ public class SetPointsActivity extends AppCompatActivity {
     }
 
     private void sendSMS(int i) {
-        String micrologId = formatMicrologId();
+        String micrologId = mMicrolog.sensorId;
         String hex;
         switch (i) {
             case 0:
@@ -221,15 +274,8 @@ public class SetPointsActivity extends AppCompatActivity {
         }
     }
 
-    private String formatMicrologId() {
-        String tempId = editTextMicrologId.getText().toString();
-        int intId = Integer.parseInt(tempId);
-
-        return tempId;
-    }
-
-    public List<Telephone> getSetPointsFromDB() {
-        return new Select().from(SetPoint.class).where("sensorPhoneNumber = ?", sensorTelephoneNumber).orderBy("setPointNumber ASC").execute();
+    public List<SetPoint> getSetPointsFromDB() {
+        return new Select().from(SetPoint.class).where("phoneNumber = ?", sensorTelephoneNumber).orderBy("setPointNumber ASC").execute();
     }
 
 
@@ -241,7 +287,10 @@ public class SetPointsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(getString(R.string.set_points_title));
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         // enabling action bar app icon and behaving it as toggle button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
     }
+
+
 }

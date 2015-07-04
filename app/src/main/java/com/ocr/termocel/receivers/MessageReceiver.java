@@ -10,7 +10,9 @@ import android.util.Log;
 import com.activeandroid.query.Select;
 import com.ocr.termocel.MainActivity;
 import com.ocr.termocel.SensorSelectorActivity;
+import com.ocr.termocel.SetPointsActivity;
 import com.ocr.termocel.model.Microlog;
+import com.ocr.termocel.model.SetPoint;
 import com.ocr.termocel.model.Temperature;
 
 /**
@@ -31,12 +33,17 @@ public class MessageReceiver extends BroadcastReceiver {
             Log.i(TAG, "tried to abort");
             abortBroadcast();
             String phoneNumber = formatMessage(messages);
-            startNewActivityOnTop(context, phoneNumber);
+            Intent newIntent = new Intent(context, MainActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("01S?2")) {
+            Log.i(TAG, "SetPoints received");
+            String phoneNumber = formatMessageSetPoints(messages);
+            Intent newIntent = new Intent(context, SetPointsActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
         }
     }
 
-    private void startNewActivityOnTop(Context context, String phoneNumber) {
-        Intent intent = new Intent(context, MainActivity.class);
+    private void startNewActivityOnTop(Context context, Intent intent, String phoneNumber) {
         intent.putExtra(SensorSelectorActivity.EXTRA_COMES_FROM_RECEIVER, true);
         intent.putExtra(EXTRA_PHONE_NUMBER, phoneNumber);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -47,30 +54,36 @@ public class MessageReceiver extends BroadcastReceiver {
     private String formatMessage(SmsMessage smsMessage) {
         String sms = smsMessage.getMessageBody();
         String[] spitedMessage = sms.split(" ");
-        String micrologId = spitedMessage[1].substring(1, 3);
-        String stateTemp = spitedMessage[2].substring(0, 3);
-        String stateString = "";
-        if (stateTemp.equalsIgnoreCase("NOR")) {
-            stateString = "Normal";
-        } else if (stateTemp.equalsIgnoreCase("ATN")) {
-            stateString = "Atencion";
-        } else if (stateTemp.equalsIgnoreCase("ADV")) {
-            stateString = "Advertencia";
-        } else if (stateTemp.equalsIgnoreCase("ALA")) {
-            stateString = "Alarma";
+        String temporalAddress = null;
+        try {
+            String micrologId = spitedMessage[1].substring(1, 3);
+            String stateTemp = spitedMessage[2].substring(0, 3);
+            String stateString = "";
+            if (stateTemp.equalsIgnoreCase("NOR")) {
+                stateString = "Normal";
+            } else if (stateTemp.equalsIgnoreCase("ATN")) {
+                stateString = "Atencion";
+            } else if (stateTemp.equalsIgnoreCase("ADV")) {
+                stateString = "Advertencia";
+            } else if (stateTemp.equalsIgnoreCase("ALA")) {
+                stateString = "Alarma";
+            }
+            String temperatureString = spitedMessage[5].substring(0, 2);
+            String relativeHumidityString = spitedMessage[8];
+            Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
+
+            temporalAddress = smsMessage.getOriginatingAddress();
+            if (temporalAddress.length() > 10) {
+                temporalAddress = smsMessage.getOriginatingAddress().substring(3, 13);
+            }
+
+            saveTemperature(smsMessage, micrologId, stateString, temperatureString, relativeHumidityString, temporalAddress);
+
+            saveMicrologID(temporalAddress, micrologId, stateString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "sms must not be well formatted");
         }
-        String temperatureString = spitedMessage[5].substring(0, 2);
-        String relativeHumidityString = spitedMessage[8];
-        Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
-
-        String temporalAddress = smsMessage.getOriginatingAddress();
-        if (temporalAddress.length() > 10) {
-            temporalAddress = smsMessage.getOriginatingAddress().substring(3, 13);
-        }
-
-        saveTemperature(smsMessage, micrologId, stateString, temperatureString, relativeHumidityString, temporalAddress);
-
-        saveMicrologID(temporalAddress, micrologId, stateString);
 
         return temporalAddress;
     }
@@ -97,6 +110,59 @@ public class MessageReceiver extends BroadcastReceiver {
             microlog.sensorId = micrologId;
             microlog.lastState = stateString;
             microlog.save();
+        }
+    }
+
+    private String formatMessageSetPoints(SmsMessage smsMessage) {
+        String sms = smsMessage.getMessageBody();
+        String temporalAddress = null;
+        Double[] setPoints = new Double[3];
+        try {
+            setPoints[0] = (double) Integer.parseInt(sms.substring(5, 9), 16);
+            setPoints[1] = (double) Integer.parseInt(sms.substring(9, 13), 16);
+            setPoints[2] = (double) Integer.parseInt(sms.substring(13, 17), 16);
+
+            temporalAddress = smsMessage.getOriginatingAddress();
+            if (temporalAddress.length() > 10) {
+                temporalAddress = smsMessage.getOriginatingAddress().substring(3, 13);
+            }
+
+            saveSetPoints(temporalAddress, setPoints, smsMessage.getTimestampMillis());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "sms must not be well formatted");
+        }
+
+        return temporalAddress;
+    }
+
+    private void saveSetPoints(String phoneNumber, Double[] setPoints, long timestampMillis) {
+        Microlog microlog = new Select().
+                from(Microlog.class).
+                where("sensorPhoneNumber = ?", phoneNumber).executeSingle();
+        for (int i = 0; i < setPoints.length; i++) {
+            SetPoint existingSetPoint = new Select().
+                    from(SetPoint.class).
+                    where("phoneNumber = ?", phoneNumber).
+                    and("setPointNumber = ?", i).executeSingle();
+            if (existingSetPoint != null) {
+                existingSetPoint.micrologId = microlog.sensorId;
+                existingSetPoint.tempInFahrenheit = setPoints[i];
+                existingSetPoint.timestamp = timestampMillis;
+                existingSetPoint.verified = true;
+                existingSetPoint.save();
+            } else {
+                SetPoint setPoint = new SetPoint(
+                        phoneNumber,
+                        microlog.sensorId,
+                        i,
+                        setPoints[i],
+                        timestampMillis,
+                        true
+                );
+                setPoint.save();
+            }
         }
     }
 }

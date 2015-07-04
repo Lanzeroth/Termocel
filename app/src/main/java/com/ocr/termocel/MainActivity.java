@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -93,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
     @InjectView(R.id.seekBarThermometer)
     SeekBar seekBarThermometer;
+
+    @InjectView(R.id.progressBar)
+    ProgressBar progressBar;
 
     @OnClick(R.id.button)
     public void buttonClicked() {
@@ -333,14 +337,21 @@ public class MainActivity extends AppCompatActivity {
      * AsyncTask for getting the sms history from the phone and get it into a local database
      */
     private class SearchForSMSHistory extends AsyncTask<String, Void, Void> {
+
+        boolean micrologIdSaved = false;
+
         @Override
         protected void onPreExecute() {
+            if (progressBar != null) {
+                progressBar.setVisibility(View.VISIBLE);
+            }
             super.onPreExecute();
         }
 
         @Override
         protected Void doInBackground(String... strings) {
             String telephoneToSearch = strings[0];
+
 
             Uri uri = Uri.parse("content://sms");
             Cursor cursor = getContentResolver().query(uri, null, null, null, null);
@@ -369,24 +380,32 @@ public class MainActivity extends AppCompatActivity {
 
         private void formatSMSMessage(String telephoneToSearch, String sms, String date) {
             String[] spitedMessage = sms.split(" ");
-            String micrologId = spitedMessage[1].substring(1, 3);
-            String stateTemp = spitedMessage[2].substring(0, 3);
-            String stateString = "";
-            if (stateTemp.equalsIgnoreCase("NOR")) {
-                stateString = "Normal";
-            } else if (stateTemp.equalsIgnoreCase("ATN")) {
-                stateString = "Atencion";
-            } else if (stateTemp.equalsIgnoreCase("ADV")) {
-                stateString = "Advertencia";
-            } else if (stateTemp.equalsIgnoreCase("ALA")) {
-                stateString = "Alarma";
+
+            try {
+                String micrologId = spitedMessage[1].substring(1, 3);
+                String stateTemp = spitedMessage[2].substring(0, 3);
+                String stateString = "";
+                if (stateTemp.equalsIgnoreCase("NOR")) {
+                    stateString = "Normal";
+                } else if (stateTemp.equalsIgnoreCase("ATN")) {
+                    stateString = "Atencion";
+                } else if (stateTemp.equalsIgnoreCase("ADV")) {
+                    stateString = "Advertencia";
+                } else if (stateTemp.equalsIgnoreCase("ALA")) {
+                    stateString = "Alarma";
+                }
+                String temperatureString = spitedMessage[5].substring(0, 2);
+                String relativeHumidityString = spitedMessage[8];
+                Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
+
+                if (!micrologIdSaved) { // we just want to do this the first time
+                    saveMicrologID(telephoneToSearch, micrologId, stateString);
+                }
+                saveTemperature(micrologId, stateString, temperatureString, relativeHumidityString, telephoneToSearch, Long.parseLong(date));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                Log.e(TAG, "SMS must not be well formatted");
             }
-            String temperatureString = spitedMessage[5].substring(0, 2);
-            String relativeHumidityString = spitedMessage[8];
-            Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
-
-
-            saveTemperature(micrologId, stateString, temperatureString, relativeHumidityString, telephoneToSearch, Long.parseLong(date));
 
         }
 
@@ -430,8 +449,25 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        private void saveMicrologID(String temporalAddress, String micrologId, String stateString) {
+            Microlog microlog = new Select().
+                    from(Microlog.class).
+                    where("sensorPhoneNumber = ?", temporalAddress).
+                    executeSingle();
+
+            if (microlog != null) {
+                microlog.sensorId = micrologId;
+                microlog.lastState = stateString;
+                microlog.save();
+                micrologIdSaved = true;
+            }
+        }
+
         @Override
         protected void onPostExecute(Void aVoid) {
+            if (progressBar != null) {
+                progressBar.setVisibility(View.GONE);
+            }
             super.onPostExecute(aVoid);
             getExistingTemperaturesForMain();
 
