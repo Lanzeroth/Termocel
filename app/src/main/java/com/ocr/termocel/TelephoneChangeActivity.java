@@ -16,7 +16,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
+import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Telephone;
+import com.ocr.termocel.receivers.MessageReceiver;
 import com.orhanobut.logger.Logger;
 
 import java.text.SimpleDateFormat;
@@ -32,8 +34,11 @@ public class TelephoneChangeActivity extends AppCompatActivity {
 
     private final String TAG = TelephoneChangeActivity.class.getSimpleName();
 
-    private final String PHONE_CONSULT = "ddT?";
-    private final String PHONE_MODIFY = "ddT";
+    private final String PHONE_CONSULT = "T?";
+    private final String PHONE_MODIFY = "T";
+
+    private Microlog mMicrolog;
+
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -114,6 +119,9 @@ public class TelephoneChangeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         sensorTelephoneNumber = intent.getStringExtra(MainActivity.EXTRA_TELEPHONE_NUMBER);
+        if (sensorTelephoneNumber == null || sensorTelephoneNumber.isEmpty()) {
+            sensorTelephoneNumber = intent.getStringExtra(MessageReceiver.EXTRA_PHONE_NUMBER);
+        }
 
         smsManager = SmsManager.getDefault();
 
@@ -138,6 +146,8 @@ public class TelephoneChangeActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mMicrolog = getMicrolog();
 
         mTelephones = getTelephonesFromDB();
         // if there is info in the database, we populate the views, otherwise we prepopulate the
@@ -238,26 +248,26 @@ public class TelephoneChangeActivity extends AppCompatActivity {
         if (consultMode) {
             switch (i) {
                 case 0:
-                    smsManager.sendTextMessage(sensorTelephoneNumber, null, PHONE_CONSULT + 2, null, null);
+                    smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_CONSULT + 2, null, null);
                     break;
                 case 1:
-                    smsManager.sendTextMessage(sensorTelephoneNumber, null, PHONE_CONSULT + 3, null, null);
+                    smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_CONSULT + 3, null, null);
                     break;
                 case 2:
-                    smsManager.sendTextMessage(sensorTelephoneNumber, null, PHONE_CONSULT + 4, null, null);
+                    smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_CONSULT + 4, null, null);
                     break;
             }
             Toast.makeText(this, "Mensaje de consulta enviado al " + sensorTelephoneNumber, Toast.LENGTH_SHORT).show();
         } else {
             switch (i) {
                 case 0:
-                    smsManager.sendTextMessage(sensorTelephoneNumber, null, PHONE_MODIFY + 2, null, null);
+                    smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_MODIFY + 2, null, null);
                     break;
                 case 1:
-                    smsManager.sendTextMessage(sensorTelephoneNumber, null, PHONE_MODIFY + 3, null, null);
+                    smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_MODIFY + 3, null, null);
                     break;
                 case 2:
-                    smsManager.sendTextMessage(sensorTelephoneNumber, null, PHONE_MODIFY + 4, null, null);
+                    smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_MODIFY + 4, null, null);
                     break;
             }
             Toast.makeText(this, "Numero" + i + " actualizado en el " + sensorTelephoneNumber, Toast.LENGTH_SHORT).show();
@@ -270,6 +280,9 @@ public class TelephoneChangeActivity extends AppCompatActivity {
         return new Select().from(Telephone.class).where("sensorPhoneNumber = ?", sensorTelephoneNumber).orderBy("phoneIndex ASC").execute();
     }
 
+    private Microlog getMicrolog() {
+        return new Select().from(Microlog.class).where("sensorPhoneNumber = ?", sensorTelephoneNumber).executeSingle();
+    }
     /**
      * sets up the top bar
      */

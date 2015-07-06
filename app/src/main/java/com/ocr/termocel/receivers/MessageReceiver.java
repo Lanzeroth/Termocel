@@ -11,12 +11,14 @@ import com.activeandroid.query.Select;
 import com.ocr.termocel.MainActivity;
 import com.ocr.termocel.SensorSelectorActivity;
 import com.ocr.termocel.SetPointsActivity;
+import com.ocr.termocel.TelephoneChangeActivity;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.SetPoint;
+import com.ocr.termocel.model.Telephone;
 import com.ocr.termocel.model.Temperature;
 
 /**
- * Receiver
+ * Receiver that listens to SMS and then formats the result and saves into our database
  */
 public class MessageReceiver extends BroadcastReceiver {
     private final String TAG = MessageReceiver.class.getSimpleName();
@@ -40,6 +42,21 @@ public class MessageReceiver extends BroadcastReceiver {
             String phoneNumber = formatMessageSetPoints(messages);
             Intent newIntent = new Intent(context, SetPointsActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("T?2")) {
+            Log.i(TAG, "Telephone 1 Received");
+            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 0);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("T?3")) {
+            Log.i(TAG, "Telephone 2 Received");
+            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 1);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("T?4")) {
+            Log.i(TAG, "Telephone 3 Received");
+            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 2);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
         }
     }
 
@@ -51,6 +68,12 @@ public class MessageReceiver extends BroadcastReceiver {
         context.startActivity(intent);
     }
 
+    /**
+     * Formats an status message and saves it into the database
+     *
+     * @param smsMessage unformatted message
+     * @return phoneNumber from where the messages comes
+     */
     private String formatMessage(SmsMessage smsMessage) {
         String sms = smsMessage.getMessageBody();
         String[] spitedMessage = sms.split(" ");
@@ -113,6 +136,12 @@ public class MessageReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * Formats an setPoints special sms message that contains all the temperatures
+     *
+     * @param smsMessage unformatted sms message
+     * @return phone number from the sms
+     */
     private String formatMessageSetPoints(SmsMessage smsMessage) {
         String sms = smsMessage.getMessageBody();
         String temporalAddress = null;
@@ -163,6 +192,57 @@ public class MessageReceiver extends BroadcastReceiver {
                 );
                 setPoint.save();
             }
+        }
+    }
+
+    /**
+     * Formats a sms that contains a single phone number to report
+     *
+     * @param smsMessage unformatted sms
+     * @param phoneIndex index to save in the database 1, 2, 3
+     * @return phone number from sms
+     */
+    private String formatMessageTelephoneNumberSingle(SmsMessage smsMessage, int phoneIndex) {
+        String sms = smsMessage.getMessageBody();
+        String temporalAddress = null;
+        try {
+            String phoneToReport = sms.substring(5, sms.length());
+
+            temporalAddress = smsMessage.getOriginatingAddress();
+            if (temporalAddress.length() > 10) {
+                temporalAddress = smsMessage.getOriginatingAddress().substring(3, 13);
+            }
+
+            saveReportingTelephoneNumber(temporalAddress, phoneIndex, phoneToReport, smsMessage.getTimestampMillis());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "sms must not be well formatted");
+        }
+
+        return temporalAddress;
+    }
+
+    public void saveReportingTelephoneNumber(String micrologPhone, int phoneIndex, String phoneToReport, long date) {
+        Telephone telephone = new Select().
+                from(Telephone.class).
+                where("sensorPhoneNumber = ?", micrologPhone).
+                and("phoneIndex = ?", phoneIndex).executeSingle();
+
+        if (telephone != null) {
+            telephone.phoneNumber = phoneToReport;
+            telephone.date = date;
+            telephone.verified = true;
+            telephone.save();
+        } else {
+            Telephone newTelephone = new Telephone(
+                    micrologPhone,
+                    phoneIndex,
+                    phoneToReport,
+                    date,
+                    true
+            );
+            newTelephone.save();
         }
     }
 }

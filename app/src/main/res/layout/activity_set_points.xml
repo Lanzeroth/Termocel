@@ -21,10 +21,10 @@
             android:padding="20dp">
             <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
             <LinearLayout
-                android:focusable="true"
-                android:focusableInTouchMode="true"
                 android:layout_width="0px"
-                android:layout_height="0px" />
+                android:layout_height="0px"
+                android:focusable="true"
+                android:focusableInTouchMode="true" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -34,7 +34,7 @@
 
                 <TextView
                     android:id="@+id/textView8"
-                    style="@style/TextViewTitle"
+                    style="@style/TextViewNormal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/set_points_microlog_id" />
@@ -58,7 +58,7 @@
                 android:text="@string/button_set_points_obtain_all" />
 
             <TextView
-                style="@style/TextViewTitle"
+                style="@style/TextViewNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -67,13 +67,16 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <SeekBar
                     android:id="@+id/seekBarSetPoint1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight=".85" />
+                    android:layout_weight=".85"
+                    android:progressDrawable="@drawable/progress_gradient"
+                    android:thumb="@drawable/thumb" />
 
                 <EditText
                     android:id="@+id/editTextSetPoint1"
@@ -99,7 +102,7 @@
                 android:text="@string/telephone_modify" />
 
             <TextView
-                style="@style/TextViewTitle"
+                style="@style/TextViewNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -108,13 +111,16 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <SeekBar
                     android:id="@+id/seekBarSetPoint2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight=".85" />
+                    android:layout_weight=".85"
+                    android:progressDrawable="@drawable/progress_gradient"
+                    android:thumb="@drawable/thumb" />
 
                 <EditText
                     android:id="@+id/editTextSetPoint2"
@@ -139,7 +145,7 @@
                 android:text="@string/telephone_modify" />
 
             <TextView
-                style="@style/TextViewTitle"
+                style="@style/TextViewNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -148,13 +154,16 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <SeekBar
                     android:id="@+id/seekBarSetPoint3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight=".85" />
+                    android:layout_weight=".85"
+                    android:progressDrawable="@drawable/progress_gradient"
+                    android:thumb="@drawable/thumb" />
 
                 <EditText
                     android:id="@+id/editTextSetPoint3"

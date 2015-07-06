@@ -153,6 +153,12 @@ public class MainActivity extends AppCompatActivity {
         setUpToolBar();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getExistingTemperaturesForMain();
+    }
+
     private void getExistingTemperaturesForMain() {
         List<Temperature> temperatures = getTemperatureList(mTelephoneNumber);
         if (temperatures != null && !temperatures.isEmpty()) {
@@ -235,9 +241,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Writes text on the Thumb drawable
      *
-     * @param drawableId
-     * @param text
-     * @return
+     * @param drawableId the resource Id
+     * @param text text to be drawn
+     * @return bitmap
      */
     public BitmapDrawable writeOnDrawable(int drawableId, String text) {
 

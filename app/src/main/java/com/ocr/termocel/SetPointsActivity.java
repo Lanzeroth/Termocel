@@ -2,6 +2,12 @@ package com.ocr.termocel;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +16,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 import com.ocr.termocel.model.Microlog;
@@ -26,6 +33,10 @@ import butterknife.OnClick;
 public class SetPointsActivity extends AppCompatActivity {
 
     private final String TAG = SetPointsActivity.class.getSimpleName();
+
+    private int mTemp1 = 36;
+    private int mTemp2 = 33;
+    private int mTemp3 = 28;
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -56,6 +67,7 @@ public class SetPointsActivity extends AppCompatActivity {
                 .setPositiveButton(getString(R.string.dialog_yes), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + "X01S?2", null, null);
+                        Toast.makeText(getApplicationContext(), getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton(getString(R.string.dialog_no), null)
@@ -65,17 +77,29 @@ public class SetPointsActivity extends AppCompatActivity {
 
     @OnClick(R.id.buttonSetPoint1)
     public void setPointClicked1() {
-        showAlertDialog(getString(R.string.dialog_title_set_point) + " 1", getString(R.string.dialog_message_confirm_sms), 0);
+        if (mTemp1 == Double.parseDouble(editTextSetPoint1.getText().toString())) {
+            showAlertDialog(getString(R.string.dialog_title_set_point) + " 1", getString(R.string.dialog_message_temperature_is_the_same), 0);
+        } else {
+            showAlertDialog(getString(R.string.dialog_title_set_point) + " 1", getString(R.string.dialog_message_confirm_sms), 0);
+        }
     }
 
     @OnClick(R.id.buttonSetPoint2)
     public void setPointClicked2() {
-        showAlertDialog(getString(R.string.dialog_title_set_point) + " 2", getString(R.string.dialog_message_confirm_sms), 1);
+        if (mTemp2 == Double.parseDouble(editTextSetPoint2.getText().toString())) {
+            showAlertDialog(getString(R.string.dialog_title_set_point) + " 2", getString(R.string.dialog_message_temperature_is_the_same), 1);
+        } else {
+            showAlertDialog(getString(R.string.dialog_title_set_point) + " 2", getString(R.string.dialog_message_confirm_sms), 1);
+        }
     }
 
     @OnClick(R.id.buttonSetPoint3)
     public void setPointClicked3() {
-        showAlertDialog(getString(R.string.dialog_title_set_point) + " 3", getString(R.string.dialog_message_confirm_sms), 2);
+        if (mTemp3 == Double.parseDouble(editTextSetPoint3.getText().toString())) {
+            showAlertDialog(getString(R.string.dialog_title_set_point) + " 3", getString(R.string.dialog_message_temperature_is_the_same), 2);
+        } else {
+            showAlertDialog(getString(R.string.dialog_title_set_point) + " 3", getString(R.string.dialog_message_confirm_sms), 2);
+        }
     }
 
 
@@ -94,7 +118,6 @@ public class SetPointsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_set_points);
         ButterKnife.inject(this);
 
-        editTextMicrologId.setEnabled(false);
 
         Intent intent = getIntent();
         sensorTelephoneNumber = intent.getStringExtra(MainActivity.EXTRA_TELEPHONE_NUMBER);
@@ -113,7 +136,7 @@ public class SetPointsActivity extends AppCompatActivity {
     }
 
     /**
-     * Handles the setpoints drawing, is separated cause it will be called when refreshing
+     * Handles the setPoints drawing, is separated cause it will be called when refreshing
      */
     private void drawSetPoints() {
         mMicrolog = getMicrolog();
@@ -128,21 +151,35 @@ public class SetPointsActivity extends AppCompatActivity {
         mSetPointList = getSetPointsFromDB();
 
         if (mSetPointList != null && !mSetPointList.isEmpty()) {
-            seekBarSetPoint1.setProgress((int) mSetPointList.get(0).tempInFahrenheit);
-            seekBarSetPoint2.setProgress((int) mSetPointList.get(1).tempInFahrenheit);
-            seekBarSetPoint3.setProgress((int) mSetPointList.get(2).tempInFahrenheit);
 
-            editTextSetPoint1.setText(String.valueOf(mSetPointList.get(0).tempInFahrenheit));
-            editTextSetPoint2.setText(String.valueOf(mSetPointList.get(1).tempInFahrenheit));
-            editTextSetPoint3.setText(String.valueOf(mSetPointList.get(2).tempInFahrenheit));
+            mTemp1 = (int) mSetPointList.get(0).tempInFahrenheit;
+            mTemp2 = (int) mSetPointList.get(1).tempInFahrenheit;
+            mTemp3 = (int) mSetPointList.get(2).tempInFahrenheit;
+
+            seekBarSetPoint1.setProgress(mTemp1);
+            seekBarSetPoint2.setProgress(mTemp2);
+            seekBarSetPoint3.setProgress(mTemp3);
+
+            seekBarSetPoint1.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp1)));
+            seekBarSetPoint2.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp2)));
+            seekBarSetPoint3.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp3)));
+
+            editTextSetPoint1.setText(String.valueOf(mTemp1));
+            editTextSetPoint2.setText(String.valueOf(mTemp2));
+            editTextSetPoint3.setText(String.valueOf(mTemp3));
         } else {
-            seekBarSetPoint1.setProgress(36);
-            seekBarSetPoint2.setProgress(33);
-            seekBarSetPoint3.setProgress(28);
+            seekBarSetPoint1.setProgress(mTemp1);
+            seekBarSetPoint2.setProgress(mTemp2);
+            seekBarSetPoint3.setProgress(mTemp3);
 
-            editTextSetPoint1.setText("36");
-            editTextSetPoint2.setText("33");
-            editTextSetPoint3.setText("28");
+            seekBarSetPoint1.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp1)));
+            seekBarSetPoint1.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp2)));
+            seekBarSetPoint1.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp3)));
+
+
+            editTextSetPoint1.setText(String.valueOf(mTemp1));
+            editTextSetPoint2.setText(String.valueOf(mTemp2));
+            editTextSetPoint3.setText(String.valueOf(mTemp3));
         }
 
         editTextSetPoint1.setSelectAllOnFocus(true);
@@ -154,6 +191,7 @@ public class SetPointsActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 editTextSetPoint1.setText(String.valueOf(i));
+                seekBarSetPoint1.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(i)));
             }
 
             @Override
@@ -170,6 +208,7 @@ public class SetPointsActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 editTextSetPoint2.setText(String.valueOf(i));
+                seekBarSetPoint2.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(i)));
             }
 
             @Override
@@ -186,6 +225,7 @@ public class SetPointsActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 editTextSetPoint3.setText(String.valueOf(i));
+                seekBarSetPoint3.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(i)));
             }
 
             @Override
@@ -198,6 +238,28 @@ public class SetPointsActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    /**
+     * Writes text on the Thumb drawable
+     *
+     * @param drawableId the resource Id
+     * @param text       text to be drawn
+     * @return bitmap
+     */
+    public BitmapDrawable writeOnDrawable(int drawableId, String text) {
+
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId).copy(Bitmap.Config.ARGB_8888, true);
+
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(40);
+
+        Canvas canvas = new Canvas(bm);
+        canvas.drawText(text, 7, 40, paint);
+
+        return new BitmapDrawable(getResources(), bm);
     }
 
     private Microlog getMicrolog() {
@@ -228,7 +290,7 @@ public class SetPointsActivity extends AppCompatActivity {
     private void setPointClick(int i) {
         SetPoint setPoint = new Select().
                 from(SetPoint.class).
-                where("sensorPhoneNumber = ?", sensorTelephoneNumber).
+                where("phoneNumber = ?", sensorTelephoneNumber).
                 and("setPointNumber = ?", i).
                 executeSingle();
         if (setPoint != null) {
@@ -252,7 +314,6 @@ public class SetPointsActivity extends AppCompatActivity {
 
         sendSMS(i);
 
-
     }
 
     private void sendSMS(int i) {
@@ -262,14 +323,17 @@ public class SetPointsActivity extends AppCompatActivity {
             case 0:
                 hex = Integer.toHexString(Integer.parseInt(editTextSetPoint1.getText().toString()));
                 smsManager.sendTextMessage(sensorTelephoneNumber, null, micrologId + "SX100" + hex, null, null);
+                Toast.makeText(this, getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
                 break;
             case 1:
                 hex = Integer.toHexString(Integer.parseInt(editTextSetPoint2.getText().toString()));
                 smsManager.sendTextMessage(sensorTelephoneNumber, null, micrologId + "SX200" + hex, null, null);
+                Toast.makeText(this, getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
                 break;
             case 2:
                 hex = Integer.toHexString(Integer.parseInt(editTextSetPoint3.getText().toString()));
                 smsManager.sendTextMessage(sensorTelephoneNumber, null, micrologId + "SX300" + hex, null, null);
+                Toast.makeText(this, getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
                 break;
         }
     }

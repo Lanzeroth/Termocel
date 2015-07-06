@@ -31,7 +31,7 @@
     <string name="main_update_date">Fecha de actualización:</string>
     <string name="set_points_microlog_id">Microlog Id</string>
     <string name="selector_new_contact">Nuevo contacto</string>
-    <string name="selector_existing_contact">Seleccionar contacto</string>
+    <string name="selector_existing_contact">Seleccionar Sensor de Lista de contactos</string>
     <string name="selector_telephone_number">Numero de teléfono</string>
     <string name="selector_id_name">Nombre Identificador</string>
     <string name="selector_button_save">Guardar</string>
@@ -43,9 +43,10 @@
     <string name="dialog_title_state">Obtener estado actual</string>
     <string name="dialog_title_set_point">Cambiar Set Point</string>
     <string name="dialog_title_get_all_set_points">Obtener todos los set points</string>
-    <string name="dialog_title_telephone">Cambiar telefono</string>
+    <string name="dialog_title_telephone">Cambiar teléfono</string>
     <string name="dialog_title_telephone_consult">Consultar telefono</string>
     <string name="dialog_message_confirm_sms">Esta acción enviará un SMS</string>
+    <string name="dialog_message_temperature_is_the_same">La temperatura es la misma que tenia anteriormente, esta seguro de enviar el mensaje?</string>
     <string name="text_100_F">100°F</string>
     <string name="text_0F">0°F</string>
 
