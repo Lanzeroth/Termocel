@@ -80,7 +80,8 @@ public class SensorSelectorActivity extends AppCompatActivity {
                     editTextNewPhoneNumber.getText().toString(),
                     null,
                     editTextName.getText().toString(),
-                    "NORMAL"
+                    "NORMAL",
+                    3
             );
             microlog.save();
             refresh();
@@ -183,7 +184,8 @@ public class SensorSelectorActivity extends AppCompatActivity {
                                     no,
                                     null,
                                     name,
-                                    null
+                                    null,
+                                    3
                             );
                             microlog.save();
                             refresh();

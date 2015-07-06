@@ -8,9 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +37,8 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     private final String TAG = TelephoneChangeActivity.class.getSimpleName();
 
     private final String PHONE_CONSULT = "T?";
+    private final String PHONES_TO_REPORT_CONSULT = "S?1";
+    private final String PHONES_TO_REPORT_CHANGE = "S#";
     private final String PHONE_MODIFY = "T";
 
     private Microlog mMicrolog;
@@ -56,6 +60,8 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     Button buttonModify2;
     @InjectView(R.id.buttonModify3)
     Button buttonModify3;
+    @InjectView(R.id.buttonModifySpinner)
+    Button buttonModifySpinner;
 
     @OnClick(R.id.buttonModify1)
     public void modifyButtonClicked1() {
@@ -90,6 +96,30 @@ public class TelephoneChangeActivity extends AppCompatActivity {
         showAlertDialog(dialogTitle + " 3", getString(R.string.dialog_message_confirm_sms), 2);
     }
 
+    @OnClick(R.id.buttonModifySpinner)
+    public void modifyButtonSpinner() {
+        String dialogTitle;
+        if (consultMode) {
+            dialogTitle = getString(R.string.dialog_title_telephone_consult_spinner);
+
+        } else {
+            dialogTitle = getString(R.string.dialog_title_telephone_spinner);
+        }
+        new AlertDialog.Builder(this)
+                .setTitle(dialogTitle)
+                .setMessage(getString(R.string.dialog_message_confirm_sms))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.dialog_yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        saveNumberOfPhonesToReport();
+                    }
+                })
+                .setNegativeButton(getString(R.string.dialog_no), null)
+                .show();
+
+    }
+
+
     @InjectView(R.id.textViewUpdateDate1)
     TextView textViewUpdateDate1;
     @InjectView(R.id.textViewUpdateDate2)
@@ -99,6 +129,9 @@ public class TelephoneChangeActivity extends AppCompatActivity {
 
     @InjectView(R.id.switchConsult)
     Switch switchConsult;
+
+    @InjectView(R.id.spinner)
+    Spinner phoneSpinner;
 
     private boolean consultMode = false;
 
@@ -123,6 +156,14 @@ public class TelephoneChangeActivity extends AppCompatActivity {
             sensorTelephoneNumber = intent.getStringExtra(MessageReceiver.EXTRA_PHONE_NUMBER);
         }
 
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.telephone_items_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        phoneSpinner.setAdapter(adapter);
+
+        phoneSpinner.getSelectedItemId();
+        Log.d(TAG, String.valueOf(phoneSpinner.getSelectedItemId()));
+
         smsManager = SmsManager.getDefault();
 
         switchConsult.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -133,21 +174,31 @@ public class TelephoneChangeActivity extends AppCompatActivity {
                     buttonModify1.setText("Consultar");
                     buttonModify2.setText("Consultar");
                     buttonModify3.setText("Consultar");
+                    buttonModifySpinner.setText("Consultar");
                     editTextPhone1.setEnabled(false);
                     editTextPhone2.setEnabled(false);
                     editTextPhone3.setEnabled(false);
+                    phoneSpinner.setEnabled(false);
                 } else {
                     buttonModify1.setText("Modificar");
                     buttonModify2.setText("Modificar");
                     buttonModify3.setText("Modificar");
+                    buttonModifySpinner.setText("Modificar");
                     editTextPhone1.setEnabled(true);
                     editTextPhone2.setEnabled(true);
                     editTextPhone3.setEnabled(true);
+                    phoneSpinner.setEnabled(true);
                 }
             }
         });
 
         mMicrolog = getMicrolog();
+
+        if (mMicrolog.numberOfPhonesToReport > 0) {
+            phoneSpinner.setSelection(mMicrolog.numberOfPhonesToReport - 1, true);
+        } else {
+            phoneSpinner.setSelection(2, true);
+        }
 
         mTelephones = getTelephonesFromDB();
         // if there is info in the database, we populate the views, otherwise we prepopulate the
@@ -244,6 +295,30 @@ public class TelephoneChangeActivity extends AppCompatActivity {
         }
     }
 
+    private void saveNumberOfPhonesToReport() {
+        try {
+            if (consultMode) {
+                smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONES_TO_REPORT_CONSULT, null, null);
+                Toast.makeText(this, "Mensaje de consulta enviado al " + sensorTelephoneNumber, Toast.LENGTH_SHORT).show();
+            } else {
+                String numberOfPhonesToReport = null;
+                if (phoneSpinner.getSelectedItemPosition() == 0) {
+                    numberOfPhonesToReport = "01";
+                } else if (phoneSpinner.getSelectedItemPosition() == 1) {
+                    numberOfPhonesToReport = "02";
+                } else if (phoneSpinner.getSelectedItemPosition() == 2) {
+                    numberOfPhonesToReport = "03";
+                }
+                mMicrolog.numberOfPhonesToReport = phoneSpinner.getSelectedItemPosition() + 1;
+                mMicrolog.save();
+
+                smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONES_TO_REPORT_CHANGE + numberOfPhonesToReport, null, null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void sendSMS(int i) throws Exception {
         if (consultMode) {
             switch (i) {
@@ -283,6 +358,7 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     private Microlog getMicrolog() {
         return new Select().from(Microlog.class).where("sensorPhoneNumber = ?", sensorTelephoneNumber).executeSingle();
     }
+
     /**
      * sets up the top bar
      */

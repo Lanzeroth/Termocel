@@ -57,6 +57,21 @@ public class MessageReceiver extends BroadcastReceiver {
             String phoneNumber = formatMessageTelephoneNumberSingle(messages, 2);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("S#01")) {
+            Log.i(TAG, "report to 1 telephone");
+            String phoneNumber = formatMessageNumberOfTelephonesToReport(messages, 1);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("S#02")) {
+            Log.i(TAG, "report to 1 telephone");
+            String phoneNumber = formatMessageNumberOfTelephonesToReport(messages, 2);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("S#03")) {
+            Log.i(TAG, "report to 1 telephone");
+            String phoneNumber = formatMessageNumberOfTelephonesToReport(messages, 3);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
         }
     }
 
@@ -244,5 +259,42 @@ public class MessageReceiver extends BroadcastReceiver {
             );
             newTelephone.save();
         }
+    }
+
+    /**
+     * Formats an sms that contains the number of phones that the sensor will report to
+     *
+     * @param smsMessage     sms
+     * @param numberOfPhones number of phones that the sensor will report to
+     * @return sensor phone number
+     */
+    private String formatMessageNumberOfTelephonesToReport(SmsMessage smsMessage, int numberOfPhones) {
+        String temporalAddress = null;
+        try {
+            temporalAddress = smsMessage.getOriginatingAddress();
+            if (temporalAddress.length() > 10) {
+                temporalAddress = smsMessage.getOriginatingAddress().substring(3, 13);
+            }
+
+            saveNumberOfPhonesToReport(temporalAddress, numberOfPhones);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "sms must not be well formatted");
+        }
+
+        return temporalAddress;
+    }
+
+    public void saveNumberOfPhonesToReport(String temporalAddress, int numberOfPhones) {
+        Microlog microlog = new Select().from(Microlog.class).
+                where("sensorPhoneNumber = ?", temporalAddress).
+                executeSingle();
+
+        if (microlog != null) {
+            microlog.numberOfPhonesToReport = numberOfPhones;
+            microlog.save();
+        }
+
     }
 }

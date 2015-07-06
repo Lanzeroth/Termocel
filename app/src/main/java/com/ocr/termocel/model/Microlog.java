@@ -22,11 +22,15 @@ public class Microlog extends Model {
     @Column
     public String lastState;
 
-    public Microlog(String sensorPhoneNumber, String sensorId, String name, String lastState) {
+    @Column
+    public int numberOfPhonesToReport;
+
+    public Microlog(String sensorPhoneNumber, String sensorId, String name, String lastState, int numberOfPhonesToReport) {
         this.sensorPhoneNumber = sensorPhoneNumber;
         this.sensorId = sensorId;
         this.name = name;
         this.lastState = lastState;
+        this.numberOfPhonesToReport = numberOfPhonesToReport;
     }
 
     public Microlog() {

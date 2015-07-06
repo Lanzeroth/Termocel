@@ -214,6 +214,44 @@
             </LinearLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Numero de Telefonos para reportar"
+                android:id="@+id/textView11"
+                style="@style/TextViewTitle"
+                android:layout_marginBottom="10dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal">
+
+                <Spinner
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/spinner" />
+
+
+                <Button
+                    android:id="@+id/buttonModifySpinner"
+                    style="@style/ButtonNormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/telephone_modify"
+                    android:layout_marginLeft="20dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
