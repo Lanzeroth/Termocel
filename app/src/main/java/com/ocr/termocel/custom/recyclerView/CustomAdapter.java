@@ -17,9 +17,11 @@
 package com.ocr.termocel.custom.recyclerView;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.ocr.termocel.R;
@@ -46,6 +48,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewName;
         private final TextView textViewNumber;
+        private final ImageButton imageButtonClear;
 
         public ViewHolder(View v) {
             super(v);
@@ -53,12 +56,20 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SensorSelectorActivity.bus.post(new SensorClickedEvent(SensorClickedEvent.Type.STARTED, 1, getPosition()));
+                    SensorSelectorActivity.bus.post(new SensorClickedEvent(SensorClickedEvent.Type.STARTED, 1, getPosition(), false));
 //                    Logger.d("Element " + getPosition() + " clicked.");
                 }
             });
             textViewName = (TextView) v.findViewById(R.id.textViewName);
             textViewNumber = (TextView) v.findViewById(R.id.textViewNumber);
+            imageButtonClear = (ImageButton) v.findViewById(R.id.imageButtonClear);
+            imageButtonClear.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "clear clicked" + getPosition());
+                    SensorSelectorActivity.bus.post(new SensorClickedEvent(SensorClickedEvent.Type.STARTED, 1, getPosition(), true));
+                }
+            });
         }
 
         public TextView getTextViewName() {

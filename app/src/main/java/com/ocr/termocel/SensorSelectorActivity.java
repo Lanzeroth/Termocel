@@ -2,11 +2,13 @@ package com.ocr.termocel;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -123,14 +125,39 @@ public class SensorSelectorActivity extends AppCompatActivity {
      * @param event
      */
     @Subscribe
-    public void sensorClicked(SensorClickedEvent event) {
+    public void sensorClicked(final SensorClickedEvent event) {
         if (event.getResultCode() == 1) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra(EXTRA_COMES_FROM_RECEIVER, false);
-            intent.putExtra(EXTRA_SELECTED_ID, event.getElementId());
-            startActivity(intent);
+            if (event.isDelete()) {
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.dialog_title_delete))
+                        .setMessage(getString(R.string.dialog_message_confirm_delete))
+                        .setCancelable(false)
+                        .setPositiveButton(getString(R.string.dialog_yes_delete), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                deleteMicrolog(event.getElementId());
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.dialog_no), null)
+                        .show();
+            } else {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra(EXTRA_COMES_FROM_RECEIVER, false);
+                intent.putExtra(EXTRA_SELECTED_ID, event.getElementId());
+                startActivity(intent);
+            }
         }
 
+    }
+
+    private void deleteMicrolog(int elementId) {
+        try {
+            Microlog microlog = mDataSet.get(elementId);
+            microlog.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            refresh();
+        }
     }
 
     /**

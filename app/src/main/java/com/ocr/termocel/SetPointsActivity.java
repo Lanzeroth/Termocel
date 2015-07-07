@@ -173,8 +173,8 @@ public class SetPointsActivity extends AppCompatActivity {
             seekBarSetPoint3.setProgress(mTemp3);
 
             seekBarSetPoint1.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp1)));
-            seekBarSetPoint1.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp2)));
-            seekBarSetPoint1.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp3)));
+            seekBarSetPoint2.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp2)));
+            seekBarSetPoint3.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(mTemp3)));
 
 
             editTextSetPoint1.setText(String.valueOf(mTemp1));
