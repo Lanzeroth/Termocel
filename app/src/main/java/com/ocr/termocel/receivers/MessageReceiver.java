@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
-import android.util.Log;
 
 import com.activeandroid.query.Select;
 import com.ocr.termocel.MainActivity;
@@ -30,46 +29,51 @@ public class MessageReceiver extends BroadcastReceiver {
         Bundle pudsBundle = intent.getExtras();
         Object[] pdus = (Object[]) pudsBundle.get("pdus");
         SmsMessage messages = SmsMessage.createFromPdu((byte[]) pdus[0]);
-        Log.i(TAG, messages.getMessageBody());
+//        Log.i(TAG, messages.getMessageBody());
         if (messages.getMessageBody().contains("MICROLOG")) {
-            Log.i(TAG, "tried to abort");
+//            Log.i(TAG, "tried to abort");
             abortBroadcast();
             String phoneNumber = formatMessage(messages);
             Intent newIntent = new Intent(context, MainActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("01S?2")) {
-            Log.i(TAG, "SetPoints received");
+//            Log.i(TAG, "SetPoints received");
             String phoneNumber = formatMessageSetPoints(messages);
             Intent newIntent = new Intent(context, SetPointsActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("T?2")) {
-            Log.i(TAG, "Telephone 1 Received");
+//            Log.i(TAG, "Telephone 1 Received");
             String phoneNumber = formatMessageTelephoneNumberSingle(messages, 0);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("T?3")) {
-            Log.i(TAG, "Telephone 2 Received");
+//            Log.i(TAG, "Telephone 2 Received");
             String phoneNumber = formatMessageTelephoneNumberSingle(messages, 1);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("T?4")) {
-            Log.i(TAG, "Telephone 3 Received");
+//            Log.i(TAG, "Telephone 3 Received");
             String phoneNumber = formatMessageTelephoneNumberSingle(messages, 2);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("S#01")) {
-            Log.i(TAG, "report to 1 telephone");
+//            Log.i(TAG, "report to 1 telephone");
             String phoneNumber = formatMessageNumberOfTelephonesToReport(messages, 1);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("S#02")) {
-            Log.i(TAG, "report to 1 telephone");
+//            Log.i(TAG, "report to 1 telephone");
             String phoneNumber = formatMessageNumberOfTelephonesToReport(messages, 2);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("S#03")) {
-            Log.i(TAG, "report to 1 telephone");
+//            Log.i(TAG, "report to 1 telephone");
             String phoneNumber = formatMessageNumberOfTelephonesToReport(messages, 3);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("S?1")) {
+//            Log.i(TAG, "report to 1 telephone");
+            String phoneNumber = formatMessageNumberOfTelephonesToReportAll(messages);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         }
@@ -297,4 +301,32 @@ public class MessageReceiver extends BroadcastReceiver {
         }
 
     }
+
+    /**
+     * Formats an sms that contains the number of phones that the sensor will report to
+     *
+     * @param smsMessage sms
+     * @return sensor phone number
+     */
+    private String formatMessageNumberOfTelephonesToReportAll(SmsMessage smsMessage) {
+        String temporalAddress = null;
+        int numberOfPhones;
+        try {
+            String tempNumber = smsMessage.getMessageBody().substring(31, 33);
+            numberOfPhones = Integer.parseInt(tempNumber);
+            temporalAddress = smsMessage.getOriginatingAddress();
+            if (temporalAddress.length() > 10) {
+                temporalAddress = smsMessage.getOriginatingAddress().substring(3, 13);
+            }
+
+            saveNumberOfPhonesToReport(temporalAddress, numberOfPhones);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+//            Log.e(TAG, "sms must not be well formatted");
+        }
+
+        return temporalAddress;
+    }
+
 }
