@@ -12,7 +12,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -221,12 +220,12 @@ public class SensorSelectorActivity extends AppCompatActivity {
 
                         phoneCur.close();
 
-                        Log.e("Name and phone number", name + " : " + no);
+//                        Log.e("Name and phone number", name + " : " + no);
                     }
                 }
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
-                Log.e(TAG, e.toString());
+//                Log.e(TAG, e.toString());
             }
         }
 

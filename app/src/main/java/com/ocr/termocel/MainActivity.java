@@ -16,7 +16,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -34,7 +33,6 @@ import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
 import com.ocr.termocel.receivers.MessageReceiver;
 import com.ocr.termocel.utilities.AndroidBus;
-import com.orhanobut.logger.Logger;
 import com.squareup.otto.Bus;
 
 import java.text.SimpleDateFormat;
@@ -213,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarThermometer.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d(TAG, "PROGRESS CHANGED " + progress);
+//                Log.d(TAG, "PROGRESS CHANGED " + progress);
                 seekBarThermometer.setThumb(writeOnDrawable(R.drawable.thumb, String.valueOf(progress)));
 
             }
@@ -267,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getUpdatedSensorInfo(String telephoneNumber) {
         try {
-            Log.d("SMS send", "sending message to " + telephoneNumber);
+//            Log.d("SMS send", "sending message to " + telephoneNumber);
             smsManager.sendTextMessage(telephoneNumber, null, STATUS, null, null);
             Toast.makeText(this, getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
@@ -402,7 +400,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 String temperatureString = spitedMessage[5].substring(0, 2);
                 String relativeHumidityString = spitedMessage[8];
-                Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
+//                Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
 
                 if (!micrologIdSaved) { // we just want to do this the first time
                     saveMicrologID(telephoneToSearch, micrologId, stateString);
@@ -410,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
                 saveTemperature(micrologId, stateString, temperatureString, relativeHumidityString, telephoneToSearch, Long.parseLong(date));
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                Log.e(TAG, "SMS must not be well formatted");
+//                Log.e(TAG, "SMS must not be well formatted");
             }
 
         }
@@ -447,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
                     new Delete().from(Temperature.class).execute();
                     ActiveAndroid.setTransactionSuccessful();
                 } catch (Exception e) {
-                    Logger.e(e, "error deleting existing db");
+//                    Logger.e(e, "error deleting existing db");
                 } finally {
                     ActiveAndroid.endTransaction();
                 }

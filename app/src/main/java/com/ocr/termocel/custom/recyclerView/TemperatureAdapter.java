@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.ocr.termocel.R;
 import com.ocr.termocel.model.Temperature;
-import com.orhanobut.logger.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -97,7 +96,6 @@ public class TemperatureAdapter extends RecyclerView.Adapter<TemperatureAdapter.
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        Logger.d("Element " + position + " set.");
 
         // Get element from your dataset at this position and replace the contents of the view
         // with that element

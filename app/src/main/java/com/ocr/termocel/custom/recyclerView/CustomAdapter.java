@@ -17,7 +17,6 @@
 package com.ocr.termocel.custom.recyclerView;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,6 @@ import com.ocr.termocel.R;
 import com.ocr.termocel.SensorSelectorActivity;
 import com.ocr.termocel.events.SensorClickedEvent;
 import com.ocr.termocel.model.Microlog;
-import com.orhanobut.logger.Logger;
 
 import java.util.List;
 
@@ -66,7 +64,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             imageButtonClear.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG, "clear clicked" + getPosition());
+//                    Log.d(TAG, "clear clicked" + getPosition());
                     SensorSelectorActivity.bus.post(new SensorClickedEvent(SensorClickedEvent.Type.STARTED, 1, getPosition(), true));
                 }
             });
@@ -107,7 +105,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        Logger.d("Element " + position + " set.");
+//        Logger.d("Element " + position + " set.");
 
         // Get element from your dataset at this position and replace the contents of the view
         // with that element

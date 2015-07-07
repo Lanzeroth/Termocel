@@ -42,8 +42,8 @@
         <activity
             android:name=".SetPointsActivity"
             android:label="@string/title_activity_set_points"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.ocr.termocel.MainActivity">
+            android:parentActivityName="com.ocr.termocel.MainActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -51,8 +51,8 @@
         <activity
             android:name=".HistoryActivity"
             android:label="@string/title_activity_history"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.ocr.termocel.MainActivity">
+            android:parentActivityName="com.ocr.termocel.MainActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

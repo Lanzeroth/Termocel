@@ -7,7 +7,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -21,7 +20,6 @@ import com.activeandroid.query.Select;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Telephone;
 import com.ocr.termocel.receivers.MessageReceiver;
-import com.orhanobut.logger.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -162,7 +160,7 @@ public class TelephoneChangeActivity extends AppCompatActivity {
         phoneSpinner.setAdapter(adapter);
 
         phoneSpinner.getSelectedItemId();
-        Log.d(TAG, String.valueOf(phoneSpinner.getSelectedItemId()));
+//        Log.d(TAG, String.valueOf(phoneSpinner.getSelectedItemId()));
 
         smsManager = SmsManager.getDefault();
 
@@ -284,7 +282,7 @@ public class TelephoneChangeActivity extends AppCompatActivity {
                     tempTelephone.date = calendar.getTimeInMillis();
                     tempTelephone.verified = false;
                     tempTelephone.save();
-                    Log.d(TAG, "telephone saved to db");
+//                    Log.d(TAG, "telephone saved to db");
                 }
             }
 
@@ -347,7 +345,6 @@ public class TelephoneChangeActivity extends AppCompatActivity {
             }
             Toast.makeText(this, "Numero" + i + " actualizado en el " + sensorTelephoneNumber, Toast.LENGTH_SHORT).show();
         }
-        Logger.d("Message send to " + sensorTelephoneNumber + "consult mode = " + consultMode + " index " + i);
 
     }
 

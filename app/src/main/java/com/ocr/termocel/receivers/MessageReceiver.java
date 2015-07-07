@@ -108,7 +108,7 @@ public class MessageReceiver extends BroadcastReceiver {
             }
             String temperatureString = spitedMessage[5].substring(0, 2);
             String relativeHumidityString = spitedMessage[8];
-            Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
+//            Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
 
             temporalAddress = smsMessage.getOriginatingAddress();
             if (temporalAddress.length() > 10) {
@@ -120,7 +120,7 @@ public class MessageReceiver extends BroadcastReceiver {
             saveMicrologID(temporalAddress, micrologId, stateString);
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "sms must not be well formatted");
+//            Log.e(TAG, "sms must not be well formatted");
         }
 
         return temporalAddress;
@@ -175,7 +175,7 @@ public class MessageReceiver extends BroadcastReceiver {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "sms must not be well formatted");
+//            Log.e(TAG, "sms must not be well formatted");
         }
 
         return temporalAddress;
@@ -232,7 +232,7 @@ public class MessageReceiver extends BroadcastReceiver {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "sms must not be well formatted");
+//            Log.e(TAG, "sms must not be well formatted");
         }
 
         return temporalAddress;
@@ -280,7 +280,7 @@ public class MessageReceiver extends BroadcastReceiver {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG, "sms must not be well formatted");
+//            Log.e(TAG, "sms must not be well formatted");
         }
 
         return temporalAddress;

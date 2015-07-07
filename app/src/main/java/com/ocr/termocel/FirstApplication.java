@@ -2,10 +2,8 @@ package com.ocr.termocel;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
-import com.orhanobut.logger.Logger;
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.log.CustomLogger;
@@ -36,9 +34,6 @@ public class FirstApplication extends Application {
 
         context = getApplicationContext();
 
-        // Logger
-        Logger.init("PL");
-
         configureJobManager();
 
     }
@@ -55,18 +50,18 @@ public class FirstApplication extends Application {
 
                     @Override
                     public void d(String text, Object... args) {
-                        Log.d(TAG, String.format(text, args));
+//                        Log.d(TAG, String.format(text, args));
                     }
 
 
                     @Override
                     public void e(Throwable t, String text, Object... args) {
-                        Log.e(TAG, String.format(text, args), t);
+//                        Log.e(TAG, String.format(text, args), t);
                     }
 
                     @Override
                     public void e(String text, Object... args) {
-                        Log.e(TAG, String.format(text, args));
+//                        Log.e(TAG, String.format(text, args));
                     }
                 })
                 .minConsumerCount(1)//always keep at least one consumer alive

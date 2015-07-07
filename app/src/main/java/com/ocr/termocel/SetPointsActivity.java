@@ -13,7 +13,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -310,7 +309,7 @@ public class SetPointsActivity extends AppCompatActivity {
             setPoint.verified = false;
             setPoint.save();
         }
-        Log.d(TAG, "set point saved to db");
+//        Log.d(TAG, "set point saved to db");
 
         sendSMS(i);
 
