@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:text="@string/selector_existing_contact"
         android:id="@+id/buttonGetContact"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="18dp"
         style="@style/ButtonNormal" />
 
     <Button
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:text="@string/selector_new_contact"
         android:id="@+id/buttonNewContact"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="18dp"
         style="@style/ButtonNormal" />
 
     <LinearLayout
@@ -94,13 +94,13 @@
         android:text="@string/selector_select_contact"
         android:id="@+id/textView2"
         android:textSize="20sp"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="18dp"/>
 
     <com.ocr.termocel.custom.recyclerView.EmptyRecyclerView
         android:id="@+id/my_recycler_view"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="129dp"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="18dp"/>
 
 </LinearLayout>

@@ -16,6 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -33,6 +34,7 @@ import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
 import com.ocr.termocel.receivers.MessageReceiver;
 import com.ocr.termocel.utilities.AndroidBus;
+import com.ocr.termocel.utilities.Tools;
 import com.squareup.otto.Bus;
 
 import java.text.SimpleDateFormat;
@@ -40,8 +42,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 
@@ -63,37 +65,37 @@ public class MainActivity extends AppCompatActivity {
 
     SmsManager smsManager;
 
-    @InjectView(R.id.toolbar)
+    @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    @InjectView(R.id.textViewContactName)
+    @Bind(R.id.textViewContactName)
     TextView textViewContactName;
 
-    @InjectView(R.id.textViewTelephone)
+    @Bind(R.id.textViewTelephone)
     TextView textViewTelephone;
 
-    @InjectView(R.id.textViewLastKnownTemp)
+    @Bind(R.id.textViewLastKnownTemp)
     TextView textViewLastKnownTemp;
 
-    @InjectView(R.id.textViewStatus)
+    @Bind(R.id.textViewStatus)
     TextView textViewStatus;
 
-    @InjectView(R.id.textViewHumidity)
+    @Bind(R.id.textViewHumidity)
     TextView textViewHumidity;
 
-    @InjectView(R.id.textViewNoInfo)
+    @Bind(R.id.textViewNoInfo)
     TextView textViewNoInfo;
 
-    @InjectView(R.id.textViewLastUpdateDate)
+    @Bind(R.id.textViewLastUpdateDate)
     TextView textViewLastUpdateDate;
 
-    @InjectView(R.id.lastDataContainer)
+    @Bind(R.id.lastDataContainer)
     LinearLayout lastDataContainer;
 
-    @InjectView(R.id.seekBarThermometer)
+    @Bind(R.id.seekBarThermometer)
     SeekBar seekBarThermometer;
 
-    @InjectView(R.id.progressBar)
+    @Bind(R.id.progressBar)
     ProgressBar progressBar;
 
     @OnClick(R.id.button)
@@ -116,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         drawThermometer();
 
@@ -139,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
 
         textViewTelephone.setText(mTelephoneNumber);
         textViewContactName.setText(mContactName);
-
 
 
         bus = new AndroidBus();
@@ -240,23 +241,35 @@ public class MainActivity extends AppCompatActivity {
      * Writes text on the Thumb drawable
      *
      * @param drawableId the resource Id
-     * @param text text to be drawn
+     * @param text       text to be drawn
      * @return bitmap
      */
     public BitmapDrawable writeOnDrawable(int drawableId, String text) {
 
         Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId).copy(Bitmap.Config.ARGB_8888, true);
 
-        Paint paint = new Paint();
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.BLACK);
-        paint.setTextSize(40);
+        paint.setTextSize(Tools.fromDpToPx(14));
+//        paint.setTextAlign(Paint.Align.CENTER);
+
 
         Canvas canvas = new Canvas(bm);
         canvas.save();
+
+        int x = (bm.getWidth() - canvas.getWidth()) / 2;
+        int y = (bm.getHeight() + canvas.getHeight()) / 2;
+
+        Log.d("X and Y", "x=" + x + " y=" + y);
         canvas.rotate(90f);
 
-        canvas.drawText(text, 5, -15, paint);
+        canvas.drawText(text, 5, -y / 4, paint);
+
+
+//        canvas.drawText(text, 5, -15, paint);
+//        canvas.drawText(text, bm.getWidth()/8, bm.getHeight()/1.33f, paint); //Change the position of the text here
+
         canvas.restore();
 
 

@@ -17,8 +17,8 @@ import com.squareup.otto.Bus;
 
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -33,17 +33,17 @@ public class HistoryActivity extends AppCompatActivity {
     String mTelephoneNumber;
 
 
-    @InjectView(R.id.recycler_view_history)
+    @Bind(R.id.recycler_view_history)
     EmptyRecyclerView recyclerViewHistory;
 
-    @InjectView(R.id.toolbar)
+    @Bind(R.id.toolbar)
     Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         Intent intent = getIntent();
         mTelephoneNumber = intent.getStringExtra(MainActivity.EXTRA_TELEPHONE_NUMBER);

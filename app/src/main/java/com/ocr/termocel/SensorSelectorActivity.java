@@ -27,8 +27,8 @@ import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 
@@ -46,16 +46,16 @@ public class SensorSelectorActivity extends AppCompatActivity {
     public static final String EXTRA_COMES_FROM_RECEIVER = "EXTRA_COMES_FROM_RECEIVER";
     private final int ACTIVITY_RESULT_CONTACT = 101;
 
-    @InjectView(R.id.editTextNewPhoneNumber)
+    @Bind(R.id.editTextNewPhoneNumber)
     EditText editTextNewPhoneNumber;
 
-    @InjectView(R.id.editTextName)
+    @Bind(R.id.editTextName)
     EditText editTextName;
 
-    @InjectView(R.id.my_recycler_view)
+    @Bind(R.id.my_recycler_view)
     EmptyRecyclerView mRecyclerView;
 
-    @InjectView(R.id.newContactContainer)
+    @Bind(R.id.newContactContainer)
     LinearLayout newContactContainer;
 
     @OnClick(R.id.buttonNewContact)
@@ -95,7 +95,7 @@ public class SensorSelectorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor_selector);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         newContactContainer.setVisibility(View.GONE);
 

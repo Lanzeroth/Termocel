@@ -21,12 +21,13 @@ import com.activeandroid.query.Select;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.SetPoint;
 import com.ocr.termocel.receivers.MessageReceiver;
+import com.ocr.termocel.utilities.Tools;
 
 import java.util.Calendar;
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class SetPointsActivity extends AppCompatActivity {
@@ -37,24 +38,24 @@ public class SetPointsActivity extends AppCompatActivity {
     private int mTemp2 = 33;
     private int mTemp3 = 28;
 
-    @InjectView(R.id.toolbar)
+    @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    @InjectView(R.id.editTextMicrologId)
+    @Bind(R.id.editTextMicrologId)
     EditText editTextMicrologId;
 
-    @InjectView(R.id.seekBarSetPoint1)
+    @Bind(R.id.seekBarSetPoint1)
     SeekBar seekBarSetPoint1;
-    @InjectView(R.id.seekBarSetPoint2)
+    @Bind(R.id.seekBarSetPoint2)
     SeekBar seekBarSetPoint2;
-    @InjectView(R.id.seekBarSetPoint3)
+    @Bind(R.id.seekBarSetPoint3)
     SeekBar seekBarSetPoint3;
 
-    @InjectView(R.id.editTextSetPoint1)
+    @Bind(R.id.editTextSetPoint1)
     EditText editTextSetPoint1;
-    @InjectView(R.id.editTextSetPoint2)
+    @Bind(R.id.editTextSetPoint2)
     EditText editTextSetPoint2;
-    @InjectView(R.id.editTextSetPoint3)
+    @Bind(R.id.editTextSetPoint3)
     EditText editTextSetPoint3;
 
     @OnClick(R.id.buttonSetPointAll)
@@ -115,7 +116,7 @@ public class SetPointsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_points);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
 
         Intent intent = getIntent();
@@ -250,13 +251,14 @@ public class SetPointsActivity extends AppCompatActivity {
 
         Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId).copy(Bitmap.Config.ARGB_8888, true);
 
-        Paint paint = new Paint();
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.BLACK);
-        paint.setTextSize(40);
+        paint.setTextSize(Tools.fromDpToPx(14));
 
         Canvas canvas = new Canvas(bm);
-        canvas.drawText(text, 7, 40, paint);
+
+        canvas.drawText(text, bm.getWidth()/8, bm.getHeight()/1.33f, paint); //Change the position of the text here
 
         return new BitmapDrawable(getResources(), bm);
     }

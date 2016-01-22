@@ -30,32 +30,36 @@
             android:id="@+id/textViewTempStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="16sp"
             tools:text="Element"
-            android:layout_weight="1" />
+            android:layout_weight="1.5"/>
 
         <TextView
             style="@style/TextViewNormal"
             android:id="@+id/textViewTempF"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="16sp"
             tools:text="Element"
-            android:layout_weight="1" />
+            android:layout_weight="0.7"/>
 
         <TextView
             style="@style/TextViewNormal"
             android:id="@+id/textViewTempHumidity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="16sp"
             tools:text="Element"
-            android:layout_weight="1" />
+            android:layout_weight="0.7"/>
 
         <TextView
             style="@style/TextViewNormal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textSize="16sp"
             tools:text="New Text"
             android:id="@+id/textViewTempTime"
-            android:layout_weight="1" />
+            android:layout_weight="1.5"/>
     </LinearLayout>
 
 

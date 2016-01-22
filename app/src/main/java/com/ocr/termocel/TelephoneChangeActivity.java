@@ -26,8 +26,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class TelephoneChangeActivity extends AppCompatActivity {
@@ -42,23 +42,23 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     private Microlog mMicrolog;
 
 
-    @InjectView(R.id.toolbar)
+    @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    @InjectView(R.id.editTextPhone1)
+    @Bind(R.id.editTextPhone1)
     EditText editTextPhone1;
-    @InjectView(R.id.editTextPhone2)
+    @Bind(R.id.editTextPhone2)
     EditText editTextPhone2;
-    @InjectView(R.id.editTextPhone3)
+    @Bind(R.id.editTextPhone3)
     EditText editTextPhone3;
 
-    @InjectView(R.id.buttonModify1)
+    @Bind(R.id.buttonModify1)
     Button buttonModify1;
-    @InjectView(R.id.buttonModify2)
+    @Bind(R.id.buttonModify2)
     Button buttonModify2;
-    @InjectView(R.id.buttonModify3)
+    @Bind(R.id.buttonModify3)
     Button buttonModify3;
-    @InjectView(R.id.buttonModifySpinner)
+    @Bind(R.id.buttonModifySpinner)
     Button buttonModifySpinner;
 
     @OnClick(R.id.buttonModify1)
@@ -118,17 +118,17 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     }
 
 
-    @InjectView(R.id.textViewUpdateDate1)
+    @Bind(R.id.textViewUpdateDate1)
     TextView textViewUpdateDate1;
-    @InjectView(R.id.textViewUpdateDate2)
+    @Bind(R.id.textViewUpdateDate2)
     TextView textViewUpdateDate2;
-    @InjectView(R.id.textViewUpdateDate3)
+    @Bind(R.id.textViewUpdateDate3)
     TextView textViewUpdateDate3;
 
-    @InjectView(R.id.switchConsult)
+    @Bind(R.id.switchConsult)
     Switch switchConsult;
 
-    @InjectView(R.id.spinner)
+    @Bind(R.id.spinner)
     Spinner phoneSpinner;
 
     private boolean consultMode = false;
@@ -143,7 +143,7 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_telephone_change);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         /** toolBar **/
         setUpToolBar();

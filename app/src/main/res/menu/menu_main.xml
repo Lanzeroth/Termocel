@@ -1,18 +1,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    <group android:id="@+id/group_configuration">
     <item
         android:id="@+id/action_telephones"
         android:title="@string/action_telephones"
-        android:orderInCategory="100" app:showAsAction="never" />
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_call_black_24dp"/>
     <item
         android:id="@+id/action_alerts"
         android:title="@string/action_alerts"
         android:orderInCategory="200"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        android:icon="@drawable/ic_warning_black_24dp"/>
+    </group>
+    <group android:id="@+id/group_history">
     <item
         android:id="@+id/action_history"
         android:title="@string/action_history"
         android:orderInCategory="200"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_access_time_black_24dp"/>
+    </group>
 </menu>
