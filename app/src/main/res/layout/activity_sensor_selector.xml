@@ -1,80 +1,84 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.ocr.termocel.SensorSelectorActivity"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_horizontal"
+              android:orientation="vertical"
+              android:paddingBottom="@dimen/activity_vertical_margin"
+              android:paddingLeft="@dimen/activity_horizontal_margin"
+              android:paddingRight="@dimen/activity_horizontal_margin"
+              android:paddingTop="@dimen/activity_vertical_margin"
+              tools:context="com.ocr.termocel.SensorSelectorActivity"
+    >
 
     <!-- A RecyclerView with some commonly used attributes -->
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageView"
         android:layout_gravity="center_horizontal"
-        android:src="@mipmap/logo" />
+        android:src="@mipmap/logo"/>
 
     <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/selector_existing_contact"
         android:id="@+id/buttonGetContact"
-        android:layout_marginTop="18dp"
-        style="@style/ButtonNormal" />
-
-    <Button
+        style="@style/ButtonNormal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/selector_new_contact"
-        android:id="@+id/buttonNewContact"
         android:layout_marginTop="18dp"
-        style="@style/ButtonNormal" />
+        android:text="@string/selector_existing_contact"/>
+
+    <Button
+        android:id="@+id/buttonNewContact"
+        style="@style/ButtonNormal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="@string/selector_new_contact"/>
 
     <LinearLayout
         android:id="@+id/newContactContainer"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:visibility="visible">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/textView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/selector_telephone_number"
-                android:id="@+id/textView4" />
+                android:text="@string/selector_telephone_number"/>
 
             <EditText
+                android:id="@+id/editTextNewPhoneNumber"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/editTextNewPhoneNumber"
-                android:singleLine="true"
-                android:phoneNumber="true" />
+                android:phoneNumber="true"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/textView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/selector_id_name"
-                android:id="@+id/textView5" />
+                android:text="@string/selector_id_name"/>
 
             <EditText
+                android:id="@+id/editTextName"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/editTextName"
-                android:singleLine="true" />
+                android:singleLine="true"/>
         </LinearLayout>
 
         <Button
@@ -84,23 +88,24 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
-            android:text="@string/selector_button_save" />
+            android:text="@string/selector_button_save"/>
     </LinearLayout>
 
 
     <TextView
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
         android:text="@string/selector_select_contact"
-        android:id="@+id/textView2"
-        android:textSize="20sp"
-        android:layout_marginTop="18dp"/>
+        android:textSize="20sp"/>
 
     <com.ocr.termocel.custom.recyclerView.EmptyRecyclerView
         android:id="@+id/my_recycler_view"
-        android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="129dp"
-        android:layout_marginTop="18dp"/>
+        android:layout_height="fill_parent"
+        android:layout_marginTop="18dp"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical"/>
 
 </LinearLayout>
