@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.ocr.termocel.HistoryActivity">
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+        android:id="@+id/action_print_log"
+        android:title="@string/action_print_log"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_mail_white_24dp"
+        app:showAsAction="ifRoom"/>
 </menu>

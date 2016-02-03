@@ -63,6 +63,11 @@
     <string name="text_history_humidity">Humedad</string>
     <string name="text_history_date">Fecha</string>
     <string name="button_set_points_obtain_all">Obtener SetPoints</string>
+    <string name="action_print_log">Exportar XLS</string>
+    <string name="extra_subject">"Reporte de temperaturas "</string>
+    <string name="extra_text">Reporte de temperaturas Termocel</string>
+    <string name="email_sent">Finalizado</string>
+    <string name="send_email">Enviar Email...</string>
 
 
     <string-array name="telephone_items_array">

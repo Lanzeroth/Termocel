@@ -7,13 +7,13 @@
         android:title="@string/action_telephones"
         android:orderInCategory="100"
         app:showAsAction="never"
-        android:icon="@drawable/ic_call_black_24dp"/>
+        android:icon="@drawable/ic_call_white_24dp"/>
     <item
         android:id="@+id/action_alerts"
         android:title="@string/action_alerts"
         android:orderInCategory="200"
         app:showAsAction="never"
-        android:icon="@drawable/ic_warning_black_24dp"/>
+        android:icon="@drawable/ic_warning_white_24dp"/>
     </group>
     <group android:id="@+id/group_history">
     <item
@@ -21,6 +21,6 @@
         android:title="@string/action_history"
         android:orderInCategory="200"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_access_time_black_24dp"/>
+        android:icon="@drawable/ic_access_time_white_24dp"/>
     </group>
 </menu>
