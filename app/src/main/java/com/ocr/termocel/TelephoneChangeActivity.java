@@ -220,7 +220,7 @@ public class TelephoneChangeActivity extends AppCompatActivity {
             for (int i = 0; i < 3; i++) {
                 Telephone telephone = new Telephone(
                         sensorTelephoneNumber,
-                        0,
+                        i,
                         "",
                         c.getTimeInMillis(),
                         false
