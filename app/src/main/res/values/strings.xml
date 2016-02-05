@@ -68,6 +68,8 @@
     <string name="extra_text">Reporte de temperaturas Termocel</string>
     <string name="email_sent">Finalizado</string>
     <string name="send_email">Enviar Email...</string>
+    <string name="toast_telephone_consult_send">"Mensaje de consulta enviado al "</string>
+    <string name="toast_telephone_change_empty">El campo de telefono esta vacio</string>
 
 
     <string-array name="telephone_items_array">

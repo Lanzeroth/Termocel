@@ -330,17 +330,29 @@ public class TelephoneChangeActivity extends AppCompatActivity {
                     smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_CONSULT + 4, null, null);
                     break;
             }
-            Toast.makeText(this, "Mensaje de consulta enviado al " + sensorTelephoneNumber, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_telephone_consult_send) + sensorTelephoneNumber, Toast.LENGTH_SHORT).show();
         } else {
             switch (i) {
                 case 0:
-                    smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_MODIFY + 2, null, null);
+                    if (!editTextPhone1.getText().toString().equals("") && !editTextPhone1.getText().toString().equals("")) {
+                        smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_MODIFY + 2 + editTextPhone1.getText().toString(), null, null);
+                    } else {
+                        Toast.makeText(this, R.string.toast_telephone_change_empty, Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case 1:
-                    smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_MODIFY + 3, null, null);
+                    if (!editTextPhone2.getText().toString().isEmpty() && !editTextPhone2.getText().toString().equals("")) {
+                        smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_MODIFY + 3 + editTextPhone2.getText().toString(), null, null);
+                    } else {
+                        Toast.makeText(this, R.string.toast_telephone_change_empty, Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case 2:
-                    smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_MODIFY + 4, null, null);
+                    if (!editTextPhone3.getText().toString().isEmpty() && !editTextPhone3.getText().toString().equals("")) {
+                        smsManager.sendTextMessage(sensorTelephoneNumber, null, mMicrolog.sensorId + PHONE_MODIFY + 4 + editTextPhone3.getText().toString(), null, null);
+                    } else {
+                        Toast.makeText(this, R.string.toast_telephone_change_empty, Toast.LENGTH_SHORT).show();
+                    }
                     break;
             }
             Toast.makeText(this, "Numero" + i + " actualizado en el " + sensorTelephoneNumber, Toast.LENGTH_SHORT).show();

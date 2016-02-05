@@ -41,19 +41,34 @@ public class MessageReceiver extends BroadcastReceiver {
             String phoneNumber = formatMessageSetPoints(messages);
             Intent newIntent = new Intent(context, SetPointsActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
-        } else if (messages.getMessageBody().contains("T?2")) {
+        } else if (messages.getMessageBody().contains("T2")) { // these are the immediate response when you change a phone
 //            Log.i(TAG, "Telephone 1 Received");
-            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 0);
+            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 4, 0);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("T3")) {
+//            Log.i(TAG, "Telephone 2 Received");
+            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 4, 1);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("T4")) {
+//            Log.i(TAG, "Telephone 3 Received");
+            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 4, 2);
+            Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
+            startNewActivityOnTop(context, newIntent, phoneNumber);
+        } else if (messages.getMessageBody().contains("T?2")) { // these are the normal consult phone response
+//            Log.i(TAG, "Telephone 1 Received");
+            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 5, 0);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("T?3")) {
 //            Log.i(TAG, "Telephone 2 Received");
-            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 1);
+            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 5, 1);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("T?4")) {
 //            Log.i(TAG, "Telephone 3 Received");
-            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 2);
+            String phoneNumber = formatMessageTelephoneNumberSingle(messages, 5, 2);
             Intent newIntent = new Intent(context, TelephoneChangeActivity.class);
             startNewActivityOnTop(context, newIntent, phoneNumber);
         } else if (messages.getMessageBody().contains("S#01")) {
@@ -218,14 +233,16 @@ public class MessageReceiver extends BroadcastReceiver {
      * Formats a sms that contains a single phone number to report
      *
      * @param smsMessage unformatted sms
+     * @param subString is the number of spaces from the beginning that we have to "ignore" to
+     *                  create our phone
      * @param phoneIndex index to save in the database 1, 2, 3
      * @return phone number from sms
      */
-    private String formatMessageTelephoneNumberSingle(SmsMessage smsMessage, int phoneIndex) {
+    private String formatMessageTelephoneNumberSingle(SmsMessage smsMessage, int subString, int phoneIndex) {
         String sms = smsMessage.getMessageBody();
         String temporalAddress = null;
         try {
-            String phoneToReport = sms.substring(5, sms.length());
+            String phoneToReport = sms.substring(subString, sms.length());
 
             temporalAddress = smsMessage.getOriginatingAddress();
             if (temporalAddress.length() > 10) {
