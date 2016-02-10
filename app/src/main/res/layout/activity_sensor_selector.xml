@@ -9,16 +9,17 @@
               android:paddingRight="@dimen/activity_horizontal_margin"
               android:paddingTop="@dimen/activity_vertical_margin"
               tools:context="com.ocr.termocel.SensorSelectorActivity"
-    >
+              android:background="@color/background_material_light">
 
     <!-- A RecyclerView with some commonly used attributes -->
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_gravity="center_horizontal"
-        android:src="@mipmap/logo"/>
+        android:src="@mipmap/logo_new"
+        />
 
     <Button
         android:id="@+id/buttonGetContact"

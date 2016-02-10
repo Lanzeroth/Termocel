@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="colorPrimary">#495e7c</color>
-    <color name="colorPrimaryDarker">#323f52</color>
+    <color name="colorPrimary">#30afc2</color>
+    <color name="colorPrimaryDarker">#30a0b1</color>
+
+    <color name="accent">@color/termocel_red</color>
+
+    <color name="termocel_red">#ee1b25</color>
+
 
     <!--Material design colors-->
     <color name="red_50">#ffebee</color>
@@ -278,5 +283,4 @@
     <color name="blue_grey_800">#37474f</color>
     <color name="blue_grey_900">#263238</color>
 
-    <color name="accent">@color/pink_A200</color>
 </resources>
