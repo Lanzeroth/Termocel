@@ -87,6 +87,11 @@ public class SensorSelectorActivity extends AppCompatActivity {
             microlog.save();
             refresh();
         }
+        if (newContactContainer.getVisibility() == View.VISIBLE) {
+            newContactContainer.setVisibility(View.GONE);
+        } else if (newContactContainer.getVisibility() == View.GONE) {
+            newContactContainer.setVisibility(View.VISIBLE);
+        }
 
     }
 

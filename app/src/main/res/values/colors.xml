@@ -2,7 +2,7 @@
 <resources>
 
     <color name="colorPrimary">#30afc2</color>
-    <color name="colorPrimaryDarker">#30a0b1</color>
+    <color name="colorPrimaryDarker">#006064</color>
 
     <color name="accent">@color/termocel_red</color>
 
