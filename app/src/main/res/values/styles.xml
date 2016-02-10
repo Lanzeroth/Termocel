@@ -5,6 +5,11 @@
         <item name="android:textColor">@color/grey_50</item>
     </style>
 
+    <style name="MyDarkToolbarStylePopup" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:colorBackground">@color/grey_50</item>
+        <item name="android:textColor">@color/grey_900</item>
+    </style>
+
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
         <item name="color">@android:color/white</item>
