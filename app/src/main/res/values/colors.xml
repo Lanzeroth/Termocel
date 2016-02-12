@@ -5,8 +5,14 @@
     <color name="colorPrimaryDarker">#006064</color>
 
     <color name="accent">@color/termocel_red</color>
+    <color name="accent_dark">@color/red_900</color>
+
+
+    <color name="white">@color/grey_50</color>
 
     <color name="termocel_red">#ee1b25</color>
+
+    <color name="tabsScrollColor">@color/termocel_red</color>
 
 
     <!--Material design colors-->

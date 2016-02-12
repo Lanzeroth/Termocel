@@ -2,28 +2,22 @@ package com.ocr.termocel;
 
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.activeandroid.query.Select;
 import com.ocr.termocel.custom.recyclerView.CustomAdapter;
-import com.ocr.termocel.custom.recyclerView.EmptyRecyclerView;
-import com.ocr.termocel.events.SensorClickedEvent;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.utilities.AndroidBus;
 import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -42,9 +36,7 @@ public class SensorSelectorActivity extends AppCompatActivity {
     protected RecyclerView.LayoutManager mLayoutManager;
     protected List<Microlog> mDataSet;
 
-    public static final String EXTRA_SELECTED_ID = "EXTRA_SELECTED_ID";
-    public static final String EXTRA_COMES_FROM_RECEIVER = "EXTRA_COMES_FROM_RECEIVER";
-    private final int ACTIVITY_RESULT_CONTACT = 101;
+    private Handler mHandler;
 
     @Bind(R.id.editTextNewPhoneNumber)
     EditText editTextNewPhoneNumber;
@@ -52,8 +44,6 @@ public class SensorSelectorActivity extends AppCompatActivity {
     @Bind(R.id.editTextName)
     EditText editTextName;
 
-    @Bind(R.id.my_recycler_view)
-    EmptyRecyclerView mRecyclerView;
 
     @Bind(R.id.newContactContainer)
     LinearLayout newContactContainer;
@@ -70,7 +60,7 @@ public class SensorSelectorActivity extends AppCompatActivity {
     @OnClick(R.id.buttonGetContact)
     public void getContactFromIntent() {
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        startActivityForResult(intent, ACTIVITY_RESULT_CONTACT);
+        startActivityForResult(intent, Constants.ACTIVITY_RESULT_CONTACT);
     }
 
 
@@ -85,7 +75,7 @@ public class SensorSelectorActivity extends AppCompatActivity {
                     3
             );
             microlog.save();
-            refresh();
+//            refreshRecyclerView();
         }
         if (newContactContainer.getVisibility() == View.VISIBLE) {
             newContactContainer.setVisibility(View.GONE);
@@ -107,51 +97,48 @@ public class SensorSelectorActivity extends AppCompatActivity {
         bus = new AndroidBus();
         bus.register(this);
 
+        mHandler = new Handler();
 
-        initDataSet();
-
-        if (mDataSet != null) {
-            // use a linear layout manager
-            mLayoutManager = new LinearLayoutManager(this);
-            mRecyclerView.setLayoutManager(mLayoutManager);
-
-            mAdapter = new CustomAdapter(mDataSet);
-            mRecyclerView.setAdapter(mAdapter);
-        } else {
-            mRecyclerView.setVisibility(View.GONE);
-        }
-
-    }
-
-    /**
-     * comes from the custom adapter, what we want is the element id to pass into the next activity
-     *
-     * @param event
-     */
-    @Subscribe
-    public void sensorClicked(final SensorClickedEvent event) {
-        if (event.getResultCode() == 1) {
-            if (event.isDelete()) {
-                new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.dialog_title_delete))
-                        .setMessage(getString(R.string.dialog_message_confirm_delete))
-                        .setCancelable(false)
-                        .setPositiveButton(getString(R.string.dialog_yes_delete), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                deleteMicrolog(event.getElementId());
-                            }
-                        })
-                        .setNegativeButton(getString(R.string.dialog_no), null)
-                        .show();
-            } else {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.putExtra(EXTRA_COMES_FROM_RECEIVER, false);
-                intent.putExtra(EXTRA_SELECTED_ID, event.getElementId());
-                startActivity(intent);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startMainActivity();
             }
-        }
+        }, 500);
+
+
 
     }
+
+//    /**
+//     * comes from the custom adapter, what we want is the element id to pass into the next activity
+//     *
+//     * @param event
+//     */
+//    @Subscribe
+//    public void sensorClicked(final SensorClickedEvent event) {
+//        if (event.getResultCode() == 1) {
+//            if (event.isDelete()) {
+//                new AlertDialog.Builder(this)
+//                        .setTitle(getString(R.string.dialog_title_delete))
+//                        .setMessage(getString(R.string.dialog_message_confirm_delete))
+//                        .setCancelable(false)
+//                        .setPositiveButton(getString(R.string.dialog_yes_delete), new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int id) {
+//                                deleteMicrolog(event.getElementId());
+//                            }
+//                        })
+//                        .setNegativeButton(getString(R.string.dialog_no), null)
+//                        .show();
+//            } else {
+//                Intent intent = new Intent(this, MainActivity.class);
+//                intent.putExtra(Constants.EXTRA_COMES_FROM_RECEIVER, false);
+//                intent.putExtra(Constants.EXTRA_SELECTED_ID, event.getElementId());
+//                startActivity(intent);
+//            }
+//        }
+//
+//    }
 
     private void deleteMicrolog(int elementId) {
         try {
@@ -160,37 +147,20 @@ public class SensorSelectorActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            refresh();
+//            refreshRecyclerView();
         }
     }
 
-    /**
-     * refreshes the ui
-     */
-    public void refresh() {
-        initDataSet();
 
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new CustomAdapter(mDataSet);
-        mRecyclerView.setAdapter(mAdapter);
-    }
 
-    private void initDataSet() {
-        mDataSet = getSensors();
-    }
-
-    public List<Microlog> getSensors() {
-        return new Select().from(Microlog.class).execute();
-    }
 
 
     @Override
     public void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
 
-        if (reqCode == ACTIVITY_RESULT_CONTACT) {
+        if (reqCode == Constants.ACTIVITY_RESULT_CONTACT) {
             try {
                 if (resultCode == Activity.RESULT_OK) {
                     Uri contactData = data.getData();
@@ -219,7 +189,8 @@ public class SensorSelectorActivity extends AppCompatActivity {
                                     3
                             );
                             microlog.save();
-                            refresh();
+//                            refreshRecyclerView();
+                            startMainActivity();
                         }
 
 
@@ -234,5 +205,11 @@ public class SensorSelectorActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    private void startMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

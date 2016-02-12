@@ -78,4 +78,24 @@
         <item>3</item>
     </string-array>
 
+    <!-- Tab Titles -->
+    <string-array name="tab_titles">
+        <item>@string/app_toolbar_title_map</item>
+        <item>@string/app_toolbar_title_detail</item>
+    </string-array>
+
+    <!--toolbar titles-->
+    <string name="app_toolbar_title_detail">Detalle</string>
+    <string name="app_toolbar_title_map">Mapa</string>
+
+
+    <string name="gps_network_not_enabled">GPS is not enabled</string>
+    <string name="gps_network_not_enabled_message">This application needs the location services to be enabled, please open the location settings and enable it</string>
+    <string name="open_location_settings">Open location settings</string>
+    <string name="dialog_cancel">Cancel</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_delete">Map</string>
+
 </resources>

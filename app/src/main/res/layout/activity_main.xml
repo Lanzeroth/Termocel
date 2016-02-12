@@ -1,213 +1,30 @@
 <!-- As the main content view, the view below consumes the entire
          space available using match_parent in both dimensions. -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
-        <TextView
-            android:id="@+id/textViewContactName"
+        <fragment
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal|top"
-            android:layout_marginTop="20dp"
-            android:textIsSelectable="false"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            tools:text="contact name" />
-
-        <TextView
-            android:id="@+id/textViewTelephone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/textViewContactName"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal|top"
-            android:layout_marginTop="23dp"
-            android:textIsSelectable="false"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            tools:text="6143032079" />
-
-        <LinearLayout
-            android:id="@+id/lastDataContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textViewTelephone"
-            android:layout_centerHorizontal="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginTop="0dp"
-                    android:text="@string/text_100_F" />
-
-                <TextView
-                    android:id="@+id/textView10"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:text="@string/text_0F" />
-            </RelativeLayout>
-
-            <com.ocr.termocel.custom.widget.VerticalSeekBar
-                android:id="@+id/seekBarThermometer"
-                android:layout_width="wrap_content"
-                android:layout_height="250dp"
-                android:layout_below="@+id/textViewContactName"
-                android:layout_toLeftOf="@+id/stateDataContainer"
-                android:layout_toStartOf="@+id/stateDataContainer"
-                android:max="100"
-                android:padding="10dp"
-                tools:progress="50"
-                android:progressDrawable="@drawable/progress_gradient"
-                android:thumb="@drawable/thumb" />
-
-            <LinearLayout
-                android:id="@+id/stateDataContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/textViewTelephone"
-                android:layout_centerHorizontal="true"
-                android:layout_marginLeft="10dp"
-
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textView"
-                    style="@style/TextViewTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/main_last_known_temp" />
-
-                <TextView
-                    android:id="@+id/textViewLastKnownTemp"
-                    style="@style/TextViewNormal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/textView7"
-                    style="@style/TextViewTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/main_status" />
-
-                <TextView
-                    android:id="@+id/textViewStatus"
-                    style="@style/TextViewNormal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/textView9"
-                    style="@style/TextViewTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/main_relative_humidity" />
-
-                <TextView
-                    android:id="@+id/textViewHumidity"
-                    style="@style/TextViewNormal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/textView6"
-                    style="@style/TextViewTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/main_update_date" />
-
-                <TextView
-                    android:id="@+id/textViewLastUpdateDate"
-                    style="@style/TextViewNormal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/textViewNoInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textViewTelephone"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="44dp"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="@string/main_no_info"
-            tools:visibility="gone" />
-
-        <Button
-            android:id="@+id/button"
-            style="@style/ButtonNormal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="32dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:text="@string/main_refresh_state_button"
-            android:textColor="@color/grey_100" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/button"
-            android:layout_marginTop="46dp"
-            android:orientation="horizontal">
-
-        </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/lastDataContainer"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="34dp"
-            android:indeterminate="true"
-            android:visibility="gone" />
-
-
-    </RelativeLayout>
-
+            android:name="com.ocr.termocel.TabFragment"
+            android:id="@+id/fragment"
+            tools:layout="@layout/fragment_tab"/>
+    </FrameLayout>
 </RelativeLayout>

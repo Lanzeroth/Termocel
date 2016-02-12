@@ -93,20 +93,4 @@
     </LinearLayout>
 
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:text="@string/selector_select_contact"
-        android:textSize="20sp"/>
-
-    <com.ocr.termocel.custom.recyclerView.EmptyRecyclerView
-        android:id="@+id/my_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginTop="18dp"
-        android:fadeScrollbars="false"
-        android:scrollbars="vertical"/>
-
 </LinearLayout>

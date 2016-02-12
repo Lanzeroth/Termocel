@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 
 import com.activeandroid.query.Select;
+import com.ocr.termocel.Constants;
 import com.ocr.termocel.MainActivity;
-import com.ocr.termocel.SensorSelectorActivity;
 import com.ocr.termocel.SetPointsActivity;
 import com.ocr.termocel.TelephoneChangeActivity;
 import com.ocr.termocel.model.Microlog;
@@ -95,7 +95,7 @@ public class MessageReceiver extends BroadcastReceiver {
     }
 
     private void startNewActivityOnTop(Context context, Intent intent, String phoneNumber) {
-        intent.putExtra(SensorSelectorActivity.EXTRA_COMES_FROM_RECEIVER, true);
+        intent.putExtra(Constants.EXTRA_COMES_FROM_RECEIVER, true);
         intent.putExtra(EXTRA_PHONE_NUMBER, phoneNumber);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

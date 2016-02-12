@@ -24,7 +24,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.ocr.termocel.R;
-import com.ocr.termocel.SensorSelectorActivity;
+import com.ocr.termocel.TabFragment;
 import com.ocr.termocel.events.SensorClickedEvent;
 import com.ocr.termocel.model.Microlog;
 
@@ -54,7 +54,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SensorSelectorActivity.bus.post(new SensorClickedEvent(SensorClickedEvent.Type.STARTED, 1, getPosition(), false));
+                    TabFragment.bus.post(new SensorClickedEvent(SensorClickedEvent.Type.STARTED, 1, getPosition(), false));
 //                    Logger.d("Element " + getPosition() + " clicked.");
                 }
             });
@@ -65,7 +65,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
                 @Override
                 public void onClick(View v) {
 //                    Log.d(TAG, "clear clicked" + getPosition());
-                    SensorSelectorActivity.bus.post(new SensorClickedEvent(SensorClickedEvent.Type.STARTED, 1, getPosition(), true));
+                    TabFragment.bus.post(new SensorClickedEvent(SensorClickedEvent.Type.STARTED, 1, getPosition(), true));
                 }
             });
         }
