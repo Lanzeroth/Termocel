@@ -1,5 +1,7 @@
 package com.ocr.termocel;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +12,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,11 +31,14 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.ocr.termocel.events.RefreshMicrologsEvent;
+import com.ocr.termocel.events.SelectContactFromPhoneEvent;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
 import com.ocr.termocel.receivers.MessageReceiver;
 import com.ocr.termocel.utilities.AndroidBus;
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -66,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements
     private LatLng mLatLng;
 
 
-
     public static Bus bus;
 
     private int selectedId;
@@ -81,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
+
+    private boolean mRequestingLocationUpdates;
 
 
     @Override
@@ -135,10 +142,10 @@ public class MainActivity extends AppCompatActivity implements
             microlog = getMicrologByPhoneNumber(mTelephoneNumber);
             mContactName = microlog.name;
         } else {
-            selectedId = intent.getIntExtra(Constants.EXTRA_SELECTED_ID, 0);
-            microlog = getMicrologs().get(selectedId);
-            mTelephoneNumber = microlog.sensorPhoneNumber;
-            mContactName = microlog.name;
+//            selectedId = intent.getIntExtra(Constants.EXTRA_SELECTED_ID, 0);
+//            microlog = getMicrologs().get(selectedId);
+//            mTelephoneNumber = microlog.sensorPhoneNumber;
+//            mContactName = microlog.name;
         }
         new SearchForSMSHistory().execute(mTelephoneNumber);
 
@@ -194,13 +201,6 @@ public class MainActivity extends AppCompatActivity implements
             dialog.show();
         }
     }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
 
     public void getUpdatedSensorInfo(String telephoneNumber) {
         try {
@@ -353,6 +353,8 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.e(TAG, "ACCURACY " + String.valueOf(location.getAccuracy()));
 
+        MapAndListFragment.mapBus.post(mLatLng);
+
 //        getLocationsFromBackend(mLatLng);
 
     }
@@ -496,5 +498,83 @@ public class MainActivity extends AppCompatActivity implements
 //            getExistingTemperaturesForMain();
 
         }
+    }
+
+    @Subscribe
+    public void startSelectContactFromPhoneIntent(SelectContactFromPhoneEvent event) {
+        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        startActivityForResult(intent, Constants.ACTIVITY_RESULT_CONTACT);
+    }
+
+    @Override
+    public void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+
+        if (reqCode == Constants.ACTIVITY_RESULT_CONTACT) {
+            try {
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri contactData = data.getData();
+                    Cursor cur = managedQuery(contactData, null, null, null, null);
+                    ContentResolver contact_resolver = getContentResolver();
+
+                    if (cur.moveToFirst()) {
+                        String id = cur.getString(cur.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+                        String name;
+                        String no;
+
+                        Cursor phoneCur = contact_resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
+
+                        if (phoneCur != null && phoneCur.moveToFirst()) {
+                            name = phoneCur.getString(phoneCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                            no = phoneCur.getString(phoneCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            if (no.length() > 10) {
+                                no = no.substring(no.length() - 10);
+                            }
+                            Microlog microlog = new Microlog(
+                                    no,
+                                    null,
+                                    name,
+                                    null,
+                                    3
+                            );
+                            microlog.save();
+                            refreshMicrologsRecyclerView();
+                        }
+
+
+                        if (phoneCur != null) {
+                            phoneCur.close();
+                        }
+
+//                        Log.e("Name and phone number", name + " : " + no);
+                    }
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+//                Log.e(TAG, e.toString());
+            }
+        }
+
+    }
+
+    private void refreshMicrologsRecyclerView() {
+        MapAndListFragment.mapBus.post(new RefreshMicrologsEvent());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+
     }
 }

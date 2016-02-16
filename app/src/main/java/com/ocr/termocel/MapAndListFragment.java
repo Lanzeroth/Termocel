@@ -1,6 +1,7 @@
 package com.ocr.termocel;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -23,6 +26,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.ocr.termocel.custom.recyclerView.CustomAdapter;
 import com.ocr.termocel.custom.recyclerView.EmptyRecyclerView;
+import com.ocr.termocel.events.CurrentSelectedMicrologEvent;
+import com.ocr.termocel.events.RefreshMicrologsEvent;
+import com.ocr.termocel.events.SelectContactFromPhoneEvent;
+import com.ocr.termocel.events.SensorClickedEvent;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.utilities.AndroidBus;
 import com.squareup.otto.Bus;
@@ -32,6 +39,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -41,9 +49,9 @@ import butterknife.ButterKnife;
  * to handle interaction events.
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment {
+public class MapAndListFragment extends Fragment {
 
-    private final String TAG = MapFragment.class.getSimpleName();
+    private final String TAG = MapAndListFragment.class.getSimpleName();
 
 //    public static List<MessagesLocation> mLocations;
 
@@ -64,18 +72,25 @@ public class MapFragment extends Fragment {
     private AlertDialog mAddDialog = null;
 
 
-    public MapFragment() {
+    public MapAndListFragment() {
         // Required empty public constructor
     }
 
     @Bind(R.id.my_recycler_view)
     EmptyRecyclerView mRecyclerView;
 
+    @Bind(R.id.textViewSelectMicrolog)
+    TextView mTextViewSelectMicrolog;
 
-//    @OnClick(R.id.fabAdd)
-//    public void addFabClicked() {
-//        inflateAddDialogFragment();
-//    }
+    @OnClick(R.id.fab_add)
+    public void addNewContactClicked() {
+        inflateAddDialogFragment();
+    }
+
+    @OnClick(R.id.fab_select)
+    public void selectContactFromPhone() {
+        MainActivity.bus.post(new SelectContactFromPhoneEvent());
+    }
 
 
     protected CustomAdapter mAdapter;
@@ -114,7 +129,7 @@ public class MapFragment extends Fragment {
 
         initDataSet();
 
-        if (mDataSet != null) {
+        if (mDataSet != null && !mDataSet.isEmpty()) {
             // use a linear layout manager
             mLayoutManager = new LinearLayoutManager(getActivity());
             mRecyclerView.setLayoutManager(mLayoutManager);
@@ -123,15 +138,17 @@ public class MapFragment extends Fragment {
             mRecyclerView.setAdapter(mAdapter);
         } else {
             mRecyclerView.setVisibility(View.GONE);
+            mTextViewSelectMicrolog.setText(R.string.add_a_microlog);
+            DetailFragment.bus.post(new CurrentSelectedMicrologEvent(null, true)); //telephone is null, thus is empty
         }
 
 
-        fabOverlayThing();
+        fabOverlayThingOnFab();
 
         return view;
     }
 
-    private void fabOverlayThing() {
+    private void fabOverlayThingOnFab() {
 //        final RelativeLayout mMapAndListContainer = (RelativeLayout) view.findViewById(R.id.mapAndListContainer);
 
         final FloatingActionsMenu mFabMenu = (FloatingActionsMenu) view.findViewById(R.id.fab_menu);
@@ -178,6 +195,26 @@ public class MapFragment extends Fragment {
 
     public List<Microlog> getSensors() {
         return new Select().from(Microlog.class).execute();
+    }
+
+    @Subscribe
+    public void refreshMicrologs(RefreshMicrologsEvent event) {
+        refreshRecyclerView();
+    }
+
+    @Subscribe
+    public void deleteMicrolog(SensorClickedEvent event) {
+
+        if (event != null) {
+            try {
+                Microlog microlog = mDataSet.get(event.getElementId());
+                microlog.delete();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                refreshRecyclerView();
+            }
+        }
     }
 
     @Subscribe
@@ -264,13 +301,31 @@ public class MapFragment extends Fragment {
 
 
     private void inflateAddDialogFragment() {
-//        LayoutInflater inflater = getActivity().getLayoutInflater();
-//        View view = inflater.inflate(R.layout.fragment_screen_slide_page, null);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//        builder.setView(view);
-//
-//        mAddDialog = builder.show();
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog_add, null);
+
+        EditText editTextNewPhoneNumber = (EditText) view.findViewById(R.id.editTextNewPhoneNumber);
+
+        EditText editTextName = (EditText) view.findViewById(R.id.editTextName);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mAddDialog.dismiss();
+            }
+        });
+        builder.setView(view);
+
+        mAddDialog = builder.show();
     }
+
 
     /**
      * This interface must be implemented by activities that contain this

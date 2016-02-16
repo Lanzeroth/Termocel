@@ -30,7 +30,7 @@
             >
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/textViewSelectMicrolog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -64,13 +64,15 @@
         fab:fab_labelsPosition="left"
         android:layout_alignBottom="@+id/space"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentEnd="false"
         android:layout_marginBottom="-30dp"
-        android:background="@color/accent_material_dark"
-        android:layout_alignParentTop="true">
+        android:background="@color/whiteOverlay"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_event"
+            android:id="@+id/fab_select"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_colorNormal="@color/accent"
@@ -81,7 +83,7 @@
             fab:fab_title="@string/selector_existing_contact"/>
 
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_photo"
+            android:id="@+id/fab_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_colorNormal="@color/accent"

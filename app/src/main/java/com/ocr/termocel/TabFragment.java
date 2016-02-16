@@ -141,7 +141,7 @@ public class TabFragment extends Fragment {
      * @param event
      */
     @Subscribe
-    public void RecyclerItemClicked(SensorClickedEvent event) {
+    public void RecyclerItemClicked(final SensorClickedEvent event) {
         if (event.getResultCode() == 1) {
             if (event.isDelete()) {
                 new AlertDialog.Builder(getActivity())
@@ -150,7 +150,8 @@ public class TabFragment extends Fragment {
                         .setCancelable(false)
                         .setPositiveButton(getString(R.string.dialog_yes_delete), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-//                                deleteMicrolog(event.getElementId());
+                                // Event on MapFragment
+                                MapAndListFragment.mapBus.post(event);
                             }
                         })
                         .setNegativeButton(getString(R.string.dialog_no), null)

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="colorPrimary">#30afc2</color>
-    <color name="colorPrimaryDarker">#006064</color>
+    <color name="colorPrimary">@color/light_blue_500</color>
+    <color name="colorPrimaryDarker">@color/light_blue_900</color>
 
     <color name="accent">@color/termocel_red</color>
     <color name="accent_dark">@color/red_900</color>
 
 
     <color name="white">@color/grey_50</color>
+
+    <color name="whiteOverlay">#6aa6a6a6</color>
 
     <color name="termocel_red">#ee1b25</color>
 

@@ -30,12 +30,14 @@ import android.widget.Toast;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.ocr.termocel.events.CurrentSelectedMicrologEvent;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
 import com.ocr.termocel.receivers.MessageReceiver;
 import com.ocr.termocel.utilities.AndroidBus;
 import com.ocr.termocel.utilities.Tools;
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -80,6 +82,8 @@ public class DetailFragment extends Fragment {
     private final String STATUS = "S";
 
     SmsManager smsManager;
+
+    private boolean isEmpty = true;
 
     @Bind(R.id.textViewContactName)
     TextView textViewContactName;
@@ -165,6 +169,8 @@ public class DetailFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
+        drawThermometer();
+
         lastDataContainer.setVisibility(View.GONE);
 
         Intent intent = getActivity().getIntent();
@@ -174,15 +180,15 @@ public class DetailFragment extends Fragment {
             microlog = getMicrologByPhoneNumber(mTelephoneNumber);
             mContactName = microlog.name;
         } else {
-            selectedId = intent.getIntExtra(Constants.EXTRA_SELECTED_ID, 0);
-            microlog = getMicrologs().get(selectedId);
-            mTelephoneNumber = microlog.sensorPhoneNumber;
-            mContactName = microlog.name;
+//            selectedId = intent.getIntExtra(Constants.EXTRA_SELECTED_ID, 0);
+//            microlog = getMicrologs().get(selectedId);
+//            mTelephoneNumber = microlog.sensorPhoneNumber;
+//            mContactName = microlog.name;
         }
-        new SearchForSMSHistory().execute(mTelephoneNumber);
-
-        textViewTelephone.setText(mTelephoneNumber);
-        textViewContactName.setText(mContactName);
+//        new SearchForSMSHistory().execute(mTelephoneNumber);
+//
+//        textViewTelephone.setText(mTelephoneNumber);
+//        textViewContactName.setText(mContactName);
 
 
         bus = new AndroidBus();
@@ -196,8 +202,18 @@ public class DetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getExistingTemperaturesForMain();
+//        getExistingTemperaturesForMain();
 
+    }
+
+    @Subscribe
+    public void updateMicrologStatus(CurrentSelectedMicrologEvent event) {
+        if (event.isEmpty()) {
+            isEmpty = true;
+        } else {
+            mTelephoneNumber = event.getPhoneNumber();
+            getExistingTemperaturesForMain();
+        }
     }
 
     private void getExistingTemperaturesForMain() {
