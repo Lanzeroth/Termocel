@@ -58,7 +58,7 @@ public class HistoryActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         Intent intent = getIntent();
-        mTelephoneNumber = intent.getStringExtra(MainActivity.EXTRA_TELEPHONE_NUMBER);
+        mTelephoneNumber = intent.getStringExtra(Constants.EXTRA_TELEPHONE_NUMBER);
 
 
         bus = new AndroidBus();

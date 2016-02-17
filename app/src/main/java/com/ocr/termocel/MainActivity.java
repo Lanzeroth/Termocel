@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private final String TAG = MainActivity.class.getSimpleName();
 
-    public static final String EXTRA_TELEPHONE_NUMBER = "EXTRA_TELEPHONE_NUMBER";
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -234,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main_activity, menu);
         return true;
     }
 
@@ -243,22 +242,22 @@ public class MainActivity extends AppCompatActivity implements
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_telephones) {
-            Intent intent = new Intent(this, TelephoneChangeActivity.class);
-            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
-            startActivity(intent);
-        } else if (id == R.id.action_alerts) {
-            Intent intent = new Intent(this, SetPointsActivity.class);
-            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
-            startActivity(intent);
-        } else if (id == R.id.action_history) {
-            Intent intent = new Intent(this, HistoryActivity.class);
-            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
-            startActivity(intent);
-        }
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_telephones) {
+//            Intent intent = new Intent(this, TelephoneChangeActivity.class);
+//            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
+//            startActivity(intent);
+//        } else if (id == R.id.action_alerts) {
+//            Intent intent = new Intent(this, SetPointsActivity.class);
+//            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
+//            startActivity(intent);
+//        } else if (id == R.id.action_history) {
+//            Intent intent = new Intent(this, HistoryActivity.class);
+//            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
+//            startActivity(intent);
+//        }
 
         return super.onOptionsItemSelected(item);
     }

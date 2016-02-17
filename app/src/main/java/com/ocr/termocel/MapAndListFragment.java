@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,7 +27,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.ocr.termocel.custom.recyclerView.CustomAdapter;
 import com.ocr.termocel.custom.recyclerView.EmptyRecyclerView;
-import com.ocr.termocel.events.CurrentSelectedMicrologEvent;
 import com.ocr.termocel.events.RefreshMicrologsEvent;
 import com.ocr.termocel.events.SelectContactFromPhoneEvent;
 import com.ocr.termocel.events.SensorClickedEvent;
@@ -82,6 +82,9 @@ public class MapAndListFragment extends Fragment {
     @Bind(R.id.textViewSelectMicrolog)
     TextView mTextViewSelectMicrolog;
 
+    @Bind(R.id.fab_menu)
+    FloatingActionsMenu mFloatingActionsMenu;
+
     @OnClick(R.id.fab_add)
     public void addNewContactClicked() {
         inflateAddDialogFragment();
@@ -129,17 +132,23 @@ public class MapAndListFragment extends Fragment {
 
         initDataSet();
 
-        if (mDataSet != null && !mDataSet.isEmpty()) {
+        if (mDataSet == null) {
+            mRecyclerView.setVisibility(View.GONE);
+        } else if (!mDataSet.isEmpty()) {
+            mTextViewSelectMicrolog.setText(R.string.add_a_microlog);
+            mLayoutManager = new LinearLayoutManager(getActivity());
+            mRecyclerView.setLayoutManager(mLayoutManager);
+
+            mAdapter = new CustomAdapter(mDataSet);
+            mRecyclerView.setAdapter(mAdapter);
+//            DetailFragment.bus.post(new CurrentSelectedMicrologEvent(null, true)); //telephone is null, thus is empty
+        } else {
             // use a linear layout manager
             mLayoutManager = new LinearLayoutManager(getActivity());
             mRecyclerView.setLayoutManager(mLayoutManager);
 
             mAdapter = new CustomAdapter(mDataSet);
             mRecyclerView.setAdapter(mAdapter);
-        } else {
-            mRecyclerView.setVisibility(View.GONE);
-            mTextViewSelectMicrolog.setText(R.string.add_a_microlog);
-            DetailFragment.bus.post(new CurrentSelectedMicrologEvent(null, true)); //telephone is null, thus is empty
         }
 
 
@@ -180,6 +189,9 @@ public class MapAndListFragment extends Fragment {
      * refreshes the ui
      */
     public void refreshRecyclerView() {
+
+        hideFloatingActionsMenu();
+
         initDataSet();
 
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -187,6 +199,16 @@ public class MapAndListFragment extends Fragment {
 
         mAdapter = new CustomAdapter(mDataSet);
         mRecyclerView.setAdapter(mAdapter);
+    }
+
+    private void hideFloatingActionsMenu() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mFloatingActionsMenu.collapse();
+            }
+        }, 500);
     }
 
     private void initDataSet() {
@@ -304,14 +326,25 @@ public class MapAndListFragment extends Fragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_add, null);
 
-        EditText editTextNewPhoneNumber = (EditText) view.findViewById(R.id.editTextNewPhoneNumber);
+        final EditText editTextNewPhoneNumber = (EditText) view.findViewById(R.id.editTextNewPhoneNumber);
 
-        EditText editTextName = (EditText) view.findViewById(R.id.editTextName);
+        final EditText editTextName = (EditText) view.findViewById(R.id.editTextName);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                if (!editTextNewPhoneNumber.getText().toString().equalsIgnoreCase("")) {
+                    Microlog microlog = new Microlog(
+                            editTextNewPhoneNumber.getText().toString(),
+                            null,
+                            editTextName.getText().toString(),
+                            "NORMAL",
+                            3
+                    );
+                    microlog.save();
+                    refreshRecyclerView();
+                }
 
             }
         });

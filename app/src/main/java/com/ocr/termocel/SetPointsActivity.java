@@ -120,7 +120,7 @@ public class SetPointsActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        sensorTelephoneNumber = intent.getStringExtra(MainActivity.EXTRA_TELEPHONE_NUMBER);
+        sensorTelephoneNumber = intent.getStringExtra(Constants.EXTRA_TELEPHONE_NUMBER);
         if (sensorTelephoneNumber == null || sensorTelephoneNumber.isEmpty()) {
             sensorTelephoneNumber = intent.getStringExtra(MessageReceiver.EXTRA_PHONE_NUMBER);
         }
