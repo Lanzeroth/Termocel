@@ -108,6 +108,11 @@ public class HistoryActivity extends AppCompatActivity {
             return true;
         }
 
+        if (item.getItemId() == android.R.id.home) {
+            super.onBackPressed();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

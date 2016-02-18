@@ -134,7 +134,7 @@ public class MapAndListFragment extends Fragment {
 
         if (mDataSet == null) {
             mRecyclerView.setVisibility(View.GONE);
-        } else if (!mDataSet.isEmpty()) {
+        } else if (mDataSet.isEmpty()) {
             mTextViewSelectMicrolog.setText(R.string.add_a_microlog);
             mLayoutManager = new LinearLayoutManager(getActivity());
             mRecyclerView.setLayoutManager(mLayoutManager);
@@ -150,7 +150,6 @@ public class MapAndListFragment extends Fragment {
             mAdapter = new CustomAdapter(mDataSet);
             mRecyclerView.setAdapter(mAdapter);
         }
-
 
         fabOverlayThingOnFab();
 

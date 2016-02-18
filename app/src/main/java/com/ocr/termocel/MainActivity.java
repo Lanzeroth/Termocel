@@ -14,13 +14,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
@@ -31,8 +31,10 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.ocr.termocel.events.GoToDetailEvent;
 import com.ocr.termocel.events.RefreshMicrologsEvent;
 import com.ocr.termocel.events.SelectContactFromPhoneEvent;
+import com.ocr.termocel.events.SensorClickedEvent;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
 import com.ocr.termocel.receivers.MessageReceiver;
@@ -47,8 +49,6 @@ import butterknife.ButterKnife;
 
 
 public class MainActivity extends AppCompatActivity implements
-        TabFragment.OnFragmentInteractionListener,
-        DetailFragment.OnFragmentInteractionListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private final String TAG = MainActivity.class.getSimpleName();
@@ -57,16 +57,6 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-
-    /**
-     * This project number comes
-     * from the Google Developers Console.
-     */
-    static final String PROJECT_NUMBER = "1079934054910";
-    public static final String PROPERTY_REG_ID = "registration_id";
-    private static final String PROPERTY_APP_VERSION = "appVersion";
-    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
 
     private LatLng mLatLng;
 
@@ -86,7 +76,11 @@ public class MainActivity extends AppCompatActivity implements
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    private boolean mRequestingLocationUpdates;
+    public static Boolean getIsSomethingSelected() {
+        return isSomethingSelected;
+    }
+
+    private static Boolean isSomethingSelected;
 
 
     @Override
@@ -99,25 +93,10 @@ public class MainActivity extends AppCompatActivity implements
         bus = new AndroidBus();
         bus.register(this);
 
+        isSomethingSelected = false;
+
         /** toolBar **/
         setUpToolBar();
-
-//        if (savedInstanceState == null) {
-//            /**
-//             * This dummy fragment is to prevent the transition error when popping the fragment backStack
-//             * Error: Attempt to invoke virtual method 'boolean android.support.v4.app.Fragment.getAllowReturnTransitionOverlap()' on a null object reference
-//             * https://code.google.com/p/android/issues/detail?id=82832
-//             */
-//            FragmentManager fragmentManager = getSupportFragmentManager();
-//
-//            fragmentManager.beginTransaction()
-//                    .add(R.id.container, new Fragment())
-//                    .addToBackStack("dummy")
-//                    .commit();
-//
-//            // on first time display view for first nav item
-//            displayView(0);
-//        }
 
         checkForLocationServicesEnabled();
 
@@ -140,13 +119,14 @@ public class MainActivity extends AppCompatActivity implements
             mTelephoneNumber = intent.getStringExtra(MessageReceiver.EXTRA_PHONE_NUMBER);
             microlog = getMicrologByPhoneNumber(mTelephoneNumber);
             mContactName = microlog.name;
+            new SearchForSMSHistory().execute(mTelephoneNumber);
+
         } else {
 //            selectedId = intent.getIntExtra(Constants.EXTRA_SELECTED_ID, 0);
 //            microlog = getMicrologs().get(selectedId);
 //            mTelephoneNumber = microlog.sensorPhoneNumber;
 //            mContactName = microlog.name;
         }
-        new SearchForSMSHistory().execute(mTelephoneNumber);
 
 
         bus = new AndroidBus();
@@ -183,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements
             dialog.setPositiveButton(getResources().getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    // TODO Auto-generated method stub
                     Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     startActivity(myIntent);
                     //get gps
@@ -193,22 +172,10 @@ public class MainActivity extends AppCompatActivity implements
 
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                    // TODO Auto-generated method stub
 
                 }
             });
             dialog.show();
-        }
-    }
-
-    public void getUpdatedSensorInfo(String telephoneNumber) {
-        try {
-//            Log.d("SMS send", "sending message to " + telephoneNumber);
-            smsManager.sendTextMessage(telephoneNumber, null, STATUS, null, null);
-            Toast.makeText(this, getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Toast.makeText(this, getString(R.string.toast_message_not_send), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
         }
     }
 
@@ -224,10 +191,6 @@ public class MainActivity extends AppCompatActivity implements
 
     public Microlog getMicrologByPhoneNumber(String phoneNumber) {
         return new Select().from(Microlog.class).where("sensorPhoneNumber = ?", phoneNumber).executeSingle();
-    }
-
-    public List<Temperature> getTemperatureList(String telephoneNumber) {
-        return new Select().from(Temperature.class).where("sensorPhoneNumber = ?", telephoneNumber).orderBy("timestamp ASC").execute();
     }
 
     @Override
@@ -358,9 +321,44 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
+    /**
+     * comes from the custom adapter, what we want is the element id to pass into the next activity
+     *
+     * @param event
+     */
+    @Subscribe
+    public void RecyclerItemClicked(final SensorClickedEvent event) {
+        if (event.getResultCode() == 1) {
+            if (event.isDelete()) {
+                isSomethingSelected = false;
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.dialog_title_delete))
+                        .setMessage(getString(R.string.dialog_message_confirm_delete))
+                        .setCancelable(false)
+                        .setPositiveButton(getString(R.string.dialog_yes_delete), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Event on MapFragment
+                                MapAndListFragment.mapBus.post(event);
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.dialog_no), null)
+                        .show();
+            } else {
+                isSomethingSelected = true;
+                selectedId = event.getElementId();
+                microlog = getMicrologs().get(selectedId);
+                if (microlog == null) {
+                    Log.d("MainActivity", "why is this null?");
+                } else {
+                    Log.d("MainActivity", microlog + microlog.name);
 
+                }
+                mTelephoneNumber = microlog.sensorPhoneNumber;
+                mContactName = microlog.name;
+
+                new SearchForSMSHistory().execute(mTelephoneNumber);
+            }
+        }
     }
 
     /**
@@ -493,9 +491,8 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            //TODO maybe make a bus call ?
-//            getExistingTemperaturesForMain();
-
+            DetailFragment.bus.post(new GoToDetailEvent(microlog));
+            TabFragment.bus.post(new GoToDetailEvent(microlog));
         }
     }
 

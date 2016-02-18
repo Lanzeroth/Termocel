@@ -1,17 +1,13 @@
 package com.ocr.termocel;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -24,16 +20,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
-import com.ocr.termocel.events.CurrentSelectedMicrologEvent;
+import com.ocr.termocel.events.GoToDetailEvent;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
 import com.ocr.termocel.receivers.MessageReceiver;
@@ -55,28 +49,16 @@ import butterknife.OnClick;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link DetailFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link DetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class DetailFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
 
     private final String TAG = MainActivity.class.getSimpleName();
 
     public static Bus bus;
 
-    private int selectedId;
     private Microlog microlog;
 
     private String mContactName;
@@ -86,7 +68,9 @@ public class DetailFragment extends Fragment {
 
     SmsManager smsManager;
 
-    private boolean isEmpty = true;
+    private boolean isSomethingSelected = false;
+
+    List<Temperature> mTemperatures;
 
     @Bind(R.id.textViewContactName)
     TextView textViewContactName;
@@ -115,10 +99,10 @@ public class DetailFragment extends Fragment {
     @Bind(R.id.seekBarThermometer)
     SeekBar seekBarThermometer;
 
-    @Bind(R.id.progressBar)
-    ProgressBar progressBar;
+    @Bind(R.id.buttonUpdateState)
+    Button mButtonUpdateSelected;
 
-    @OnClick(R.id.button)
+    @OnClick(R.id.buttonUpdateState)
     public void buttonClicked() {
         new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.dialog_title_state))
@@ -137,32 +121,6 @@ public class DetailFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DetailFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DetailFragment newInstance(String param1, String param2) {
-        DetailFragment fragment = new DetailFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -185,17 +143,13 @@ public class DetailFragment extends Fragment {
             mTelephoneNumber = intent.getStringExtra(MessageReceiver.EXTRA_PHONE_NUMBER);
             microlog = getMicrologByPhoneNumber(mTelephoneNumber);
             mContactName = microlog.name;
-        } else {
-//            selectedId = intent.getIntExtra(Constants.EXTRA_SELECTED_ID, 0);
-//            microlog = getMicrologs().get(selectedId);
-//            mTelephoneNumber = microlog.sensorPhoneNumber;
-//            mContactName = microlog.name;
         }
-//        new SearchForSMSHistory().execute(mTelephoneNumber);
-//
-//        textViewTelephone.setText(mTelephoneNumber);
-//        textViewContactName.setText(mContactName);
 
+        isSomethingSelected = MainActivity.getIsSomethingSelected();
+        if (!isSomethingSelected) {
+            textViewNoInfo.setText(R.string.no_microlog_selected);
+            mButtonUpdateSelected.setVisibility(View.INVISIBLE);
+        }
 
 
         smsManager = SmsManager.getDefault();
@@ -208,26 +162,36 @@ public class DetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-//        getExistingTemperaturesForMain();
-
     }
 
+    /**
+     * In here we define what happens when we click a microlog from the recycler view
+     *
+     * @param event
+     */
     @Subscribe
-    public void updateMicrologStatus(CurrentSelectedMicrologEvent event) {
-        if (event.isEmpty()) {
-            isEmpty = true;
-        } else {
-            mTelephoneNumber = event.getPhoneNumber();
+    public void micrologClicked(GoToDetailEvent event) {
+        if (event != null) {
+            isSomethingSelected = true;
+            microlog = event.getMicrolog();
+            mTelephoneNumber = microlog.sensorPhoneNumber;
+            mContactName = microlog.name;
+
+            textViewTelephone.setText(mTelephoneNumber);
+            textViewContactName.setText(mContactName);
+
+            mButtonUpdateSelected.setVisibility(View.VISIBLE);
             getExistingTemperaturesForMain();
         }
     }
 
+
     private void getExistingTemperaturesForMain() {
-        List<Temperature> temperatures = getTemperatureList(mTelephoneNumber);
-        if (temperatures != null && !temperatures.isEmpty()) {
+        mTemperatures = getTemperatureList(mTelephoneNumber);
+        if (mTemperatures != null && !mTemperatures.isEmpty()) {
             lastDataContainer.setVisibility(View.VISIBLE);
             textViewNoInfo.setVisibility(View.GONE);
-            Temperature temperature = temperatures.get(temperatures.size() - 1);
+            Temperature temperature = mTemperatures.get(mTemperatures.size() - 1);
 
             textViewLastKnownTemp.setText(String.valueOf(temperature.tempInFahrenheit) + " \u00B0 F");
 
@@ -257,6 +221,9 @@ public class DetailFragment extends Fragment {
             simpleDateFormat.setCalendar(calendar);
 
             textViewLastUpdateDate.setText(simpleDateFormat.format(calendar.getTime()));
+        } else {
+            textViewNoInfo.setVisibility(View.VISIBLE);
+            lastDataContainer.setVisibility(View.GONE);
         }
     }
 
@@ -338,14 +305,6 @@ public class DetailFragment extends Fragment {
         }
     }
 
-    /**
-     * A Microlog is kind of the main object of this app, from this we get temperatures
-     *
-     * @return a sensor list
-     */
-    public List<Microlog> getMicrologs() {
-        return new Select().from(Microlog.class).execute();
-    }
 
     public Microlog getMicrologByPhoneNumber(String phoneNumber) {
         return new Select().from(Microlog.class).where("sensorPhoneNumber = ?", phoneNumber).executeSingle();
@@ -355,22 +314,15 @@ public class DetailFragment extends Fragment {
         return new Select().from(Temperature.class).where("sensorPhoneNumber = ?", telephoneNumber).orderBy("timestamp ASC").execute();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (!isSomethingSelected) {
+            menu.getItem(1).setEnabled(false);
+            menu.getItem(2).setEnabled(false);
+            menu.getItem(3).setEnabled(false);
         }
+
     }
 
     @Override
@@ -404,163 +356,4 @@ public class DetailFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
-
-    private class SearchForSMSHistory extends AsyncTask<String, Void, Void> {
-
-        boolean micrologIdSaved = false;
-
-        @Override
-        protected void onPreExecute() {
-            if (progressBar != null) {
-                progressBar.setVisibility(View.VISIBLE);
-            }
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            String telephoneToSearch = strings[0];
-
-
-            Uri uri = Uri.parse("content://sms");
-            Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
-            eraseTemperaturesFromLocalDB();
-
-            if (cursor.moveToFirst()) {
-                for (int i = 0; i < cursor.getCount(); i++) {
-                    String number = cursor.getString(cursor.getColumnIndexOrThrow("address"));
-                    if (number.length() > 10) {
-                        number = number.substring(number.length() - 10);
-                    }
-                    if (number.equalsIgnoreCase(telephoneToSearch)) {
-                        String body = cursor.getString(cursor.getColumnIndexOrThrow("body"));
-                        String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
-                        String type = cursor.getString(cursor.getColumnIndexOrThrow("type"));
-                        if (body.contains("MICROLOG") && type.equalsIgnoreCase("1")) {
-                            formatSMSMessage(telephoneToSearch, body, date);
-                        }
-                    }
-                    cursor.moveToNext();
-                }
-            }
-            cursor.close();
-            return null;
-        }
-
-        private void formatSMSMessage(String telephoneToSearch, String sms, String date) {
-            String[] spitedMessage = sms.split(" ");
-
-            try {
-                String micrologId = spitedMessage[1].substring(1, 3);
-                String stateTemp = spitedMessage[2].substring(0, 3);
-                String stateString = "";
-                if (stateTemp.equalsIgnoreCase("NOR")) {
-                    stateString = "Normal";
-                } else if (stateTemp.equalsIgnoreCase("ATN")) {
-                    stateString = "Atencion";
-                } else if (stateTemp.equalsIgnoreCase("ADV")) {
-                    stateString = "Advertencia";
-                } else if (stateTemp.equalsIgnoreCase("ALA")) {
-                    stateString = "Alarma";
-                }
-                String temperatureString = spitedMessage[5].substring(0, 2);
-                String relativeHumidityString = spitedMessage[8];
-//                Log.d(TAG, micrologId + " " + stateString + " " + temperatureString + " " + relativeHumidityString);
-
-                if (!micrologIdSaved) { // we just want to do this the first time
-                    saveMicrologID(telephoneToSearch, micrologId, stateString);
-                }
-                saveTemperature(micrologId, stateString, temperatureString, relativeHumidityString, telephoneToSearch, Long.parseLong(date));
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-//                Log.e(TAG, "SMS must not be well formatted");
-            }
-
-        }
-
-        private void saveTemperature(String micrologId, String stateString, String temperatureString, String relativeHumidityString, String temporalAddress, long date) {
-            ActiveAndroid.beginTransaction();
-            try {
-                Temperature temperature = new Temperature(
-                        temporalAddress,
-                        micrologId,
-                        stateString,
-                        Double.parseDouble(temperatureString),
-                        Double.parseDouble(relativeHumidityString),
-                        date
-                );
-                temperature.save();
-                ActiveAndroid.setTransactionSuccessful();
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            } finally {
-                ActiveAndroid.endTransaction();
-            }
-        }
-
-        /**
-         * Database erase
-         * Erases the db so we don't have to check if the reading already exists and don't put duplicates
-         */
-        private void eraseTemperaturesFromLocalDB() {
-            List<Temperature> tempList = new Select().from(Temperature.class).execute();
-            if (tempList != null && tempList.size() > 0) {
-                ActiveAndroid.beginTransaction();
-                try {
-                    new Delete().from(Temperature.class).execute();
-                    ActiveAndroid.setTransactionSuccessful();
-                } catch (Exception e) {
-//                    Logger.e(e, "error deleting existing db");
-                } finally {
-                    ActiveAndroid.endTransaction();
-                }
-            }
-
-        }
-
-        private void saveMicrologID(String temporalAddress, String micrologId, String stateString) {
-            Microlog microlog = new Select().
-                    from(Microlog.class).
-                    where("sensorPhoneNumber = ?", temporalAddress).
-                    executeSingle();
-
-            if (microlog != null) {
-                microlog.sensorId = micrologId;
-                microlog.lastState = stateString;
-                microlog.save();
-                micrologIdSaved = true;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (progressBar != null) {
-                progressBar.setVisibility(View.GONE);
-            }
-            super.onPostExecute(aVoid);
-            getExistingTemperaturesForMain();
-
-        }
-    }
 }
