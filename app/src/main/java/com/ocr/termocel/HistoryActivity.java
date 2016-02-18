@@ -105,6 +105,7 @@ public class HistoryActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_print_log) {
             printLogInXLS();
+            test();
             return true;
         }
 
@@ -114,6 +115,25 @@ public class HistoryActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * This test is to get the data from the firebase
+     */
+    private void test() {
+//        String firebaseString = "https://autolog.firebaseio.com/" + mTelephoneNumber;
+//        Firebase myFirebaseRef = new Firebase(firebaseString);
+//        myFirebaseRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Log.d(TAG, dataSnapshot.toString());
+//            }
+//
+//            @Override
+//            public void onCancelled(FirebaseError firebaseError) {
+//
+//            }
+//        });
     }
 
     private void printLogInXLS() {

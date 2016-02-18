@@ -22,11 +22,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
+import com.firebase.client.Firebase;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.ocr.termocel.events.GoToDetailEvent;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
@@ -71,6 +75,12 @@ public class DetailFragment extends Fragment {
     private boolean isSomethingSelected = false;
 
     List<Temperature> mTemperatures;
+
+    boolean comesFromReceiver = false;
+
+    private ShowcaseView mShowcaseView;
+    private int mShowCaseCounter = 0;
+
 
     @Bind(R.id.textViewContactName)
     TextView textViewContactName;
@@ -138,7 +148,7 @@ public class DetailFragment extends Fragment {
         lastDataContainer.setVisibility(View.GONE);
 
         Intent intent = getActivity().getIntent();
-        boolean comesFromReceiver = intent.getBooleanExtra(Constants.EXTRA_COMES_FROM_RECEIVER, false);
+        comesFromReceiver = intent.getBooleanExtra(Constants.EXTRA_COMES_FROM_RECEIVER, false);
         if (comesFromReceiver) {
             mTelephoneNumber = intent.getStringExtra(MessageReceiver.EXTRA_PHONE_NUMBER);
             microlog = getMicrologByPhoneNumber(mTelephoneNumber);
@@ -182,6 +192,8 @@ public class DetailFragment extends Fragment {
 
             mButtonUpdateSelected.setVisibility(View.VISIBLE);
             getExistingTemperaturesForMain();
+
+
         }
     }
 
@@ -221,6 +233,16 @@ public class DetailFragment extends Fragment {
             simpleDateFormat.setCalendar(calendar);
 
             textViewLastUpdateDate.setText(simpleDateFormat.format(calendar.getTime()));
+
+            if (comesFromReceiver) {
+                Firebase myFirebaseRef = new Firebase(getResources().getString(R.string.firebase_url));
+                Calendar c = Calendar.getInstance();
+                myFirebaseRef.child(mTelephoneNumber).child(String.valueOf(c.getTimeInMillis())).setValue(temperature);
+
+                // clear the flag
+                comesFromReceiver = false;
+
+            }
         } else {
             textViewNoInfo.setVisibility(View.VISIBLE);
             lastDataContainer.setVisibility(View.GONE);
@@ -351,9 +373,52 @@ public class DetailFragment extends Fragment {
             Intent intent = new Intent(getActivity(), HistoryActivity.class);
             intent.putExtra(Constants.EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
             startActivity(intent);
+        } else if (id == R.id.action_detail_help) {
+            showShowcaseHelp();
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    private void showShowcaseHelp() {
+        // this is to put the button on the right
+        RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
+        lps.setMargins(margin, margin, margin, margin);
+
+        mShowcaseView = new ShowcaseView.Builder(getActivity())
+                .setTarget(new ViewTarget(getActivity().findViewById(R.id.buttonUpdateState)))
+                .setContentText(getString(R.string.help_detail_update))
+                .setStyle(R.style.CustomShowcaseTheme4)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+
+                        switch (mShowCaseCounter) {
+                            case 0:
+                                mShowcaseView.setShowcase(new ViewTarget(getActivity().findViewById(R.id.lastDataContainer)), true);
+                                mShowcaseView.setContentText(getString(R.string.help_detail_container));
+
+                                break;
+                            case 1:
+                                mShowcaseView.hide();
+//                setAlpha(1.0f, textView1, textView2, textView3);
+                                mShowCaseCounter = -1;
+                                break;
+                        }
+                        mShowCaseCounter++;
+                    }
+                })
+                .build();
+        mShowcaseView.setButtonText(getString(R.string.next));
+        mShowcaseView.setHideOnTouchOutside(true);
+        mShowcaseView.setButtonPosition(lps);
+
+    }
+
 
 }

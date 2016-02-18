@@ -1,6 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+
+    <group android:id="@+id/group_help">
+        <item
+            android:id="@+id/action_detail_help"
+            android:title="@string/action_help"
+            android:orderInCategory="100"
+            app:showAsAction="ifRoom"
+            android:icon="@drawable/ic_help_outline_white_24dp"/>
+    </group>
     <group android:id="@+id/group_configuration">
     <item
         android:id="@+id/action_telephones"

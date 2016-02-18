@@ -19,8 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
@@ -73,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements
 
     SmsManager smsManager;
 
+
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
@@ -119,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements
             mTelephoneNumber = intent.getStringExtra(MessageReceiver.EXTRA_PHONE_NUMBER);
             microlog = getMicrologByPhoneNumber(mTelephoneNumber);
             mContactName = microlog.name;
+
+
             new SearchForSMSHistory().execute(mTelephoneNumber);
 
         } else {
@@ -191,38 +192,6 @@ public class MainActivity extends AppCompatActivity implements
 
     public Microlog getMicrologByPhoneNumber(String phoneNumber) {
         return new Select().from(Microlog.class).where("sensorPhoneNumber = ?", phoneNumber).executeSingle();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main_activity, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_telephones) {
-//            Intent intent = new Intent(this, TelephoneChangeActivity.class);
-//            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
-//            startActivity(intent);
-//        } else if (id == R.id.action_alerts) {
-//            Intent intent = new Intent(this, SetPointsActivity.class);
-//            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
-//            startActivity(intent);
-//        } else if (id == R.id.action_history) {
-//            Intent intent = new Intent(this, HistoryActivity.class);
-//            intent.putExtra(EXTRA_TELEPHONE_NUMBER, mTelephoneNumber);
-//            startActivity(intent);
-//        }
-
-        return super.onOptionsItemSelected(item);
     }
 
 

@@ -2,7 +2,6 @@ package com.ocr.termocel;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -10,14 +9,20 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.InflateException;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,7 +50,6 @@ import butterknife.OnClick;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * create an instance of this fragment.
  */
@@ -70,6 +74,9 @@ public class MapAndListFragment extends Fragment {
 
     private AlertDialog mMarkerDialog = null;
     private AlertDialog mAddDialog = null;
+
+    private ShowcaseView mShowcaseView;
+    private int mShowCaseCounter = 0;
 
 
     public MapAndListFragment() {
@@ -152,6 +159,8 @@ public class MapAndListFragment extends Fragment {
         }
 
         fabOverlayThingOnFab();
+
+        setHasOptionsMenu(true);
 
         return view;
     }
@@ -358,19 +367,65 @@ public class MapAndListFragment extends Fragment {
         mAddDialog = builder.show();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_map_and_list, menu);
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_help) {
+            showShowcaseHelp();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private void showShowcaseHelp() {
+
+        // this is to put the button on the left
+        RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
+        lps.setMargins(margin, margin, margin, margin);
+
+        mShowcaseView = new ShowcaseView.Builder(getActivity())
+                .setTarget(new ViewTarget(getActivity().findViewById(R.id.fab_add)))
+                .setContentText(getString(R.string.help_main_add))
+                .setStyle(R.style.CustomShowcaseTheme4)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        switch (mShowCaseCounter) {
+                            case 0:
+                                mShowcaseView.setShowcase(new ViewTarget(getActivity().findViewById(R.id.my_recycler_view)), true);
+                                mShowcaseView.setContentText(getString(R.string.help_main_list));
+                                break;
+
+                            case 1:
+                                mShowcaseView.setShowcase(new ViewTarget(getActivity().findViewById(R.id.map)), true);
+                                mShowcaseView.setContentText(getString(R.string.help_main_map));
+                                break;
+                            case 2:
+                                mShowcaseView.hide();
+//                setAlpha(1.0f, textView1, textView2, textView3);
+                                mShowCaseCounter = -1;
+                                break;
+                        }
+                        mShowCaseCounter++;
+
+                    }
+                })
+                .build();
+        mShowcaseView.setButtonText(getString(R.string.next));
+        mShowcaseView.setHideOnTouchOutside(true);
+        mShowcaseView.setButtonPosition(lps);
+
     }
 }
