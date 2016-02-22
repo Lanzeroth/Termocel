@@ -12,11 +12,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
+import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.ocr.termocel.custom.recyclerView.EmptyRecyclerView;
 import com.ocr.termocel.custom.recyclerView.TemperatureAdapter;
+import com.ocr.termocel.custom.showCaseView.ToolbarActionItemTarget;
 import com.ocr.termocel.model.Temperature;
 import com.ocr.termocel.utilities.AndroidBus;
 import com.ocr.termocel.utilities.ExcelReportWriter;
@@ -44,6 +48,8 @@ public class HistoryActivity extends AppCompatActivity {
 
     String mTelephoneNumber;
 
+    private ShowcaseView mShowcaseView;
+    private int mShowCaseCounter = 0;
 
     @Bind(R.id.recycler_view_history)
     EmptyRecyclerView recyclerViewHistory;
@@ -107,6 +113,9 @@ public class HistoryActivity extends AppCompatActivity {
             printLogInXLS();
             test();
             return true;
+        }
+        if (id == R.id.action_history_help) {
+            showShowcaseHelp();
         }
 
         if (item.getItemId() == android.R.id.home) {
@@ -204,5 +213,24 @@ public class HistoryActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+    }
+
+    private void showShowcaseHelp() {
+        // this is to put the button on the right
+        RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
+        lps.setMargins(margin, margin, margin, margin);
+
+        mShowcaseView = new ShowcaseView.Builder(this)
+                .setTarget(new ToolbarActionItemTarget(toolbar, R.id.action_history_help))
+                .setContentText(getString(R.string.help_history_export))
+                .setStyle(R.style.CustomShowcaseTheme4)
+
+                .build();
+        mShowcaseView.setButtonText(getString(R.string.hide));
+        mShowcaseView.setHideOnTouchOutside(true);
+
     }
 }

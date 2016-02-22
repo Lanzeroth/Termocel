@@ -72,9 +72,9 @@
     <string name="extra_subject">"Reporte de temperaturas "</string>
     <string name="extra_text">Reporte de temperaturas Termocel</string>
     <string name="email_sent">Finalizado</string>
-    <string name="send_email">Enviar Email...</string>
+    <string name="send_email">Enviar Email…</string>
     <string name="toast_telephone_consult_send">"Mensaje de consulta enviado al "</string>
-    <string name="toast_telephone_change_empty">El campo de telefono esta vacio</string>
+    <string name="toast_telephone_change_empty">El campo de teléfono esta vació</string>
 
 
     <string-array name="telephone_items_array">
@@ -104,11 +104,14 @@
     <string name="title_activity_delete">Map</string>
     <string name="add_a_microlog">Agrega un Microlog</string>
     <string name="no_microlog_selected">No tiene ningún microlog seleccionado, por favor seleccione uno</string>
-    <string name="help_main_add">Utilize este boton para agregar un Microlog, puede agregarlo de su lista de contactos o crear uno nuevo</string>
+    <string name="help_main_add">Utilize este botón para agregar un Microlog, puede agregarlo de su lista de contactos o crear uno nuevo</string>
     <string name="next">Siguiente</string>
-    <string name="help_main_list">Aqui, una vez agregados, podra ver su lista de Micrologs</string>
-    <string name="help_main_map">En este mapa podra ver los micrologs por su hubicacion geografica</string>
-    <string name="help_detail_update">Para actualizar el estado de su microlog presione el boton de "Actualizar Estado"</string>
-    <string name="help_detail_container">Aqui puede ver los datos de su microlog y su ultima actualizacion</string>
+    <string name="hide">Ocultar</string>
+    <string name="help_main_list">Aquí, una vez agregados, podrá ver su lista de Micrologs</string>
+    <string name="help_main_map">En este mapa podrá ver los micrologs por su hubicación geográfica</string>
+    <string name="help_detail_update">Para actualizar el estado de su microlog presione el botón de "Actualizar Estado"</string>
+    <string name="help_detail_container">Aquí puede ver los datos de su microlog y su ultima actualización</string>
+    <string name="help_telephone_consult">Para cambiar el modo a solo consulta, active este switch. En este modo solo se pedirán actualizaciones de cada sección.</string>
+    <string name="help_history_export">Presione aquí para exportar su historial y mandarlo como .xls. Se le presentaran varias opciones de preferencia elija su cliente de correo electrónico.</string>
 
 </resources>

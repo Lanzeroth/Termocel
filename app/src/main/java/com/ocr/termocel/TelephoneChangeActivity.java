@@ -7,17 +7,22 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Telephone;
 import com.ocr.termocel.receivers.MessageReceiver;
@@ -42,6 +47,8 @@ public class TelephoneChangeActivity extends AppCompatActivity {
 
     private Microlog mMicrolog;
 
+    private ShowcaseView mShowcaseView;
+    private int mShowCaseCounter = 0;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -374,8 +381,18 @@ public class TelephoneChangeActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             super.onBackPressed();
         }
+        if (item.getItemId() == R.id.action_telephones_help) {
+            showShowcaseHelp();
+        }
         return true;
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_telephone_change, menu);
+        return true;
+    }
+
 
     /**
      * sets up the top bar
@@ -388,5 +405,24 @@ public class TelephoneChangeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+    }
+
+    private void showShowcaseHelp() {
+        // this is to put the button on the right
+        RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
+        lps.setMargins(margin, margin, margin, margin);
+
+        mShowcaseView = new ShowcaseView.Builder(this)
+                .setTarget(new ViewTarget(findViewById(R.id.switchConsult)))
+                .setContentText(getString(R.string.help_telephone_consult))
+                .setStyle(R.style.CustomShowcaseTheme4)
+
+                .build();
+        mShowcaseView.setButtonText(getString(R.string.hide));
+        mShowcaseView.setHideOnTouchOutside(true);
+
     }
 }

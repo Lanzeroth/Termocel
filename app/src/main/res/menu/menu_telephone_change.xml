@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.ocr.termocel.TelephoneChangeActivity">
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+        android:id="@+id/action_telephones_help"
+        android:title="@string/action_help"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_help_outline_white_24dp"/>
+
 </menu>
