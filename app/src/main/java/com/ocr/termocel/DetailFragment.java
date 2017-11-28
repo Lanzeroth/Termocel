@@ -28,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
-import com.firebase.client.Firebase;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.ocr.termocel.events.GoToDetailEvent;
@@ -45,7 +44,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -82,34 +81,34 @@ public class DetailFragment extends Fragment {
     private int mShowCaseCounter = 0;
 
 
-    @Bind(R.id.textViewContactName)
+    @BindView(R.id.textViewContactName)
     TextView textViewContactName;
 
-    @Bind(R.id.textViewTelephone)
+    @BindView(R.id.textViewTelephone)
     TextView textViewTelephone;
 
-    @Bind(R.id.textViewLastKnownTemp)
+    @BindView(R.id.textViewLastKnownTemp)
     TextView textViewLastKnownTemp;
 
-    @Bind(R.id.textViewStatus)
+    @BindView(R.id.textViewStatus)
     TextView textViewStatus;
 
-    @Bind(R.id.textViewHumidity)
+    @BindView(R.id.textViewHumidity)
     TextView textViewHumidity;
 
-    @Bind(R.id.textViewNoInfo)
+    @BindView(R.id.textViewNoInfo)
     TextView textViewNoInfo;
 
-    @Bind(R.id.textViewLastUpdateDate)
+    @BindView(R.id.textViewLastUpdateDate)
     TextView textViewLastUpdateDate;
 
-    @Bind(R.id.lastDataContainer)
+    @BindView(R.id.lastDataContainer)
     LinearLayout lastDataContainer;
 
-    @Bind(R.id.seekBarThermometer)
+    @BindView(R.id.seekBarThermometer)
     SeekBar seekBarThermometer;
 
-    @Bind(R.id.buttonUpdateState)
+    @BindView(R.id.buttonUpdateState)
     Button mButtonUpdateSelected;
 
     @OnClick(R.id.buttonUpdateState)
@@ -235,9 +234,10 @@ public class DetailFragment extends Fragment {
             textViewLastUpdateDate.setText(simpleDateFormat.format(calendar.getTime()));
 
             if (comesFromReceiver) {
-                Firebase myFirebaseRef = new Firebase(getResources().getString(R.string.firebase_url));
-                Calendar c = Calendar.getInstance();
-                myFirebaseRef.child(mTelephoneNumber).child(String.valueOf(c.getTimeInMillis())).setValue(temperature);
+
+//                Firebase myFirebaseRef = new Firebase(getResources().getString(R.string.firebase_url));
+//                Calendar c = Calendar.getInstance();
+//                myFirebaseRef.child(mTelephoneNumber).child(String.valueOf(c.getTimeInMillis())).setValue(temperature);
 
                 // clear the flag
                 comesFromReceiver = false;

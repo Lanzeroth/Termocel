@@ -1,9 +1,13 @@
 package com.ocr.termocel;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +31,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -42,9 +47,10 @@ import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
 
 /**
@@ -53,7 +59,7 @@ import butterknife.OnClick;
  * to handle interaction events.
  * create an instance of this fragment.
  */
-public class MapAndListFragment extends Fragment {
+public class MapAndListFragment extends Fragment implements OnMapReadyCallback {
 
     private final String TAG = MapAndListFragment.class.getSimpleName();
 
@@ -62,6 +68,10 @@ public class MapAndListFragment extends Fragment {
     private static View view;
 
     public static Bus mapBus;
+
+    private Unbinder unbinder;
+
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 200;
 
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -83,13 +93,13 @@ public class MapAndListFragment extends Fragment {
         // Required empty public constructor
     }
 
-    @Bind(R.id.my_recycler_view)
+    @BindView(R.id.my_recycler_view)
     EmptyRecyclerView mRecyclerView;
 
-    @Bind(R.id.textViewSelectMicrolog)
+    @BindView(R.id.textViewSelectMicrolog)
     TextView mTextViewSelectMicrolog;
 
-    @Bind(R.id.fab_menu)
+    @BindView(R.id.fab_menu)
     FloatingActionsMenu mFloatingActionsMenu;
 
     @OnClick(R.id.fab_add)
@@ -100,6 +110,7 @@ public class MapAndListFragment extends Fragment {
     @OnClick(R.id.fab_select)
     public void selectContactFromPhone() {
         MainActivity.bus.post(new SelectContactFromPhoneEvent());
+        askForPermissions();
     }
 
 
@@ -128,7 +139,7 @@ public class MapAndListFragment extends Fragment {
         }
         try {
             view = inflater.inflate(R.layout.fragment_map, container, false);
-            ButterKnife.bind(this, view);
+            unbinder = ButterKnife.bind(this, view);
 
         } catch (InflateException e) {
             e.printStackTrace();
@@ -273,13 +284,18 @@ public class MapAndListFragment extends Fragment {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment. (THIS TOOK 2 HOURS)
-            mMap = ((SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            ((SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
             }
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        setUpMap();
     }
 
     /**
@@ -289,24 +305,36 @@ public class MapAndListFragment extends Fragment {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.setMyLocationEnabled(true);
+        if (this.getContext() != null) {
+            if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
 
-        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
+            mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                @Override
+                public void onInfoWindowClick(Marker marker) {
 //                goLockyMarker = eventMarkerMap.get(marker.getId());
 //                inflateMarkerClickedDialog(goLockyMarker);
-            }
-        });
+                }
+            });
 
-        // Initiate loadings
+            // Initiate loadings
 
-        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
+            mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                @Override
+                public void onMapLoaded() {
 //                MainActivity.bus.post(new StartRegisteringUserEvent(StartRegisteringUserEvent.Type.STARTED, 1));
-            }
-        });
+                }
+            });
+        }
     }
 
 
@@ -326,11 +354,31 @@ public class MapAndListFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
+    }
+
+    private void askForPermissions(){
+        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this.getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+
+            return;
+        }
     }
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+
+
     private void inflateAddDialogFragment() {
+
+        askForPermissions();
+
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_add, null);
 

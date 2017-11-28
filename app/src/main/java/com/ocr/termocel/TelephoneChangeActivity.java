@@ -32,7 +32,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -50,23 +50,23 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     private ShowcaseView mShowcaseView;
     private int mShowCaseCounter = 0;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.editTextPhone1)
+    @BindView(R.id.editTextPhone1)
     EditText editTextPhone1;
-    @Bind(R.id.editTextPhone2)
+    @BindView(R.id.editTextPhone2)
     EditText editTextPhone2;
-    @Bind(R.id.editTextPhone3)
+    @BindView(R.id.editTextPhone3)
     EditText editTextPhone3;
 
-    @Bind(R.id.buttonModify1)
+    @BindView(R.id.buttonModify1)
     Button buttonModify1;
-    @Bind(R.id.buttonModify2)
+    @BindView(R.id.buttonModify2)
     Button buttonModify2;
-    @Bind(R.id.buttonModify3)
+    @BindView(R.id.buttonModify3)
     Button buttonModify3;
-    @Bind(R.id.buttonModifySpinner)
+    @BindView(R.id.buttonModifySpinner)
     Button buttonModifySpinner;
 
     @OnClick(R.id.buttonModify1)
@@ -126,17 +126,17 @@ public class TelephoneChangeActivity extends AppCompatActivity {
     }
 
 
-    @Bind(R.id.textViewUpdateDate1)
+    @BindView(R.id.textViewUpdateDate1)
     TextView textViewUpdateDate1;
-    @Bind(R.id.textViewUpdateDate2)
+    @BindView(R.id.textViewUpdateDate2)
     TextView textViewUpdateDate2;
-    @Bind(R.id.textViewUpdateDate3)
+    @BindView(R.id.textViewUpdateDate3)
     TextView textViewUpdateDate3;
 
-    @Bind(R.id.switchConsult)
+    @BindView(R.id.switchConsult)
     Switch switchConsult;
 
-    @Bind(R.id.spinner)
+    @BindView(R.id.spinner)
     Spinner phoneSpinner;
 
     private boolean consultMode = false;

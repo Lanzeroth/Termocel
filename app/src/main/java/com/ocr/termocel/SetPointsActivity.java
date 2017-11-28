@@ -27,7 +27,7 @@ import com.ocr.termocel.utilities.Tools;
 import java.util.Calendar;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -39,24 +39,24 @@ public class SetPointsActivity extends AppCompatActivity {
     private int mTemp2 = 33;
     private int mTemp3 = 28;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @Bind(R.id.editTextMicrologId)
+    @BindView(R.id.editTextMicrologId)
     EditText editTextMicrologId;
 
-    @Bind(R.id.seekBarSetPoint1)
+    @BindView(R.id.seekBarSetPoint1)
     SeekBar seekBarSetPoint1;
-    @Bind(R.id.seekBarSetPoint2)
+    @BindView(R.id.seekBarSetPoint2)
     SeekBar seekBarSetPoint2;
-    @Bind(R.id.seekBarSetPoint3)
+    @BindView(R.id.seekBarSetPoint3)
     SeekBar seekBarSetPoint3;
 
-    @Bind(R.id.editTextSetPoint1)
+    @BindView(R.id.editTextSetPoint1)
     EditText editTextSetPoint1;
-    @Bind(R.id.editTextSetPoint2)
+    @BindView(R.id.editTextSetPoint2)
     EditText editTextSetPoint2;
-    @Bind(R.id.editTextSetPoint3)
+    @BindView(R.id.editTextSetPoint3)
     EditText editTextSetPoint3;
 
     @OnClick(R.id.buttonSetPointAll)

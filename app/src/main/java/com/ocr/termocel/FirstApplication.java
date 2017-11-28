@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 
 import com.activeandroid.ActiveAndroid;
-import com.firebase.client.Firebase;
 import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.config.Configuration;
 import com.path.android.jobqueue.log.CustomLogger;
@@ -37,7 +36,7 @@ public class FirstApplication extends Application {
 
         configureJobManager();
 
-        Firebase.setAndroidContext(this);
+//        Firebase.setAndroidContext(this);
 
     }
 

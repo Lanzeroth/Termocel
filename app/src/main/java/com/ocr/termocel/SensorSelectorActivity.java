@@ -14,7 +14,7 @@ import com.squareup.otto.Bus;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 
 public class SensorSelectorActivity extends AppCompatActivity {
@@ -36,7 +36,7 @@ public class SensorSelectorActivity extends AppCompatActivity {
 //    EditText editTextName;
 
 
-    @Bind(R.id.newContactContainer)
+    @BindView(R.id.newContactContainer)
     LinearLayout newContactContainer;
 //
 //    @OnClick(R.id.buttonNewContact)
