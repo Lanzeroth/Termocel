@@ -33,6 +33,11 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.ocr.termocel.events.GoToDetailEvent;
 import com.ocr.termocel.events.RefreshMicrologsEvent;
 import com.ocr.termocel.events.SelectContactFromPhoneEvent;
@@ -53,39 +58,26 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-    private final String TAG = MainActivity.class.getSimpleName();
-
-
-    private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private static final int MY_PERMISSIONS_REQUEST_READ_FINE_LOCATION = 100;
-
-    private LatLng mLatLng;
-
-
     public static Bus bus;
-
-    private int selectedId;
-    private Microlog microlog;
-
-    private String mContactName;
-    private String mTelephoneNumber;
-
+    private static Boolean isSomethingSelected;
+    private final String TAG = MainActivity.class.getSimpleName();
     private final String STATUS = "S";
-
     SmsManager smsManager;
-
-
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    private LatLng mLatLng;
+    private int selectedId;
+    private Microlog microlog;
+    private String mContactName;
+    private String mTelephoneNumber;
 
     public static Boolean getIsSomethingSelected() {
         return isSomethingSelected;
     }
-
-    private static Boolean isSomethingSelected;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +85,19 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
+        Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.READ_CONTACTS,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.READ_SMS)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {/* ... */}
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {/* ... */}
+                }).check();
 
         bus = new AndroidBus();
         bus.register(this);
@@ -241,11 +246,10 @@ public class MainActivity extends AppCompatActivity implements
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "Location services connected.");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS},
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_READ_FINE_LOCATION);
 
             return;
@@ -365,6 +369,84 @@ public class MainActivity extends AppCompatActivity implements
                 new SearchForSMSHistory().execute(mTelephoneNumber);
             }
         }
+    }
+
+    @Subscribe
+    public void startSelectContactFromPhoneIntent(SelectContactFromPhoneEvent event) {
+        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        startActivityForResult(intent, Constants.ACTIVITY_RESULT_CONTACT);
+    }
+
+    @Override
+    public void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+
+        if (reqCode == Constants.ACTIVITY_RESULT_CONTACT) {
+            try {
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri contactData = data.getData();
+                    Cursor cur = managedQuery(contactData, null, null, null, null);
+                    ContentResolver contact_resolver = getContentResolver();
+
+                    if (cur.moveToFirst()) {
+                        String id = cur.getString(cur.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+                        String name;
+                        String no;
+
+                        Cursor phoneCur = contact_resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
+
+                        if (phoneCur != null && phoneCur.moveToFirst()) {
+                            name = phoneCur.getString(phoneCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                            no = phoneCur.getString(phoneCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            if (no.length() > 10) {
+                                no = no.substring(no.length() - 10);
+                            }
+                            Microlog microlog = new Microlog(
+                                    no,
+                                    null,
+                                    name,
+                                    null,
+                                    3
+                            );
+                            microlog.save();
+                            refreshMicrologsRecyclerView();
+                        }
+
+
+                        if (phoneCur != null) {
+                            phoneCur.close();
+                        }
+
+//                        Log.e("Name and phone number", name + " : " + no);
+                    }
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+//                Log.e(TAG, e.toString());
+            }
+        }
+
+    }
+
+    private void refreshMicrologsRecyclerView() {
+        MapAndListFragment.mapBus.post(new RefreshMicrologsEvent());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+
     }
 
     /**
@@ -500,83 +582,5 @@ public class MainActivity extends AppCompatActivity implements
             DetailFragment.bus.post(new GoToDetailEvent(microlog));
             TabFragment.bus.post(new GoToDetailEvent(microlog));
         }
-    }
-
-    @Subscribe
-    public void startSelectContactFromPhoneIntent(SelectContactFromPhoneEvent event) {
-        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        startActivityForResult(intent, Constants.ACTIVITY_RESULT_CONTACT);
-    }
-
-    @Override
-    public void onActivityResult(int reqCode, int resultCode, Intent data) {
-        super.onActivityResult(reqCode, resultCode, data);
-
-        if (reqCode == Constants.ACTIVITY_RESULT_CONTACT) {
-            try {
-                if (resultCode == Activity.RESULT_OK) {
-                    Uri contactData = data.getData();
-                    Cursor cur = managedQuery(contactData, null, null, null, null);
-                    ContentResolver contact_resolver = getContentResolver();
-
-                    if (cur.moveToFirst()) {
-                        String id = cur.getString(cur.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
-                        String name;
-                        String no;
-
-                        Cursor phoneCur = contact_resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
-                                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
-
-                        if (phoneCur != null && phoneCur.moveToFirst()) {
-                            name = phoneCur.getString(phoneCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                            no = phoneCur.getString(phoneCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                            if (no.length() > 10) {
-                                no = no.substring(no.length() - 10);
-                            }
-                            Microlog microlog = new Microlog(
-                                    no,
-                                    null,
-                                    name,
-                                    null,
-                                    3
-                            );
-                            microlog.save();
-                            refreshMicrologsRecyclerView();
-                        }
-
-
-                        if (phoneCur != null) {
-                            phoneCur.close();
-                        }
-
-//                        Log.e("Name and phone number", name + " : " + no);
-                    }
-                }
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-//                Log.e(TAG, e.toString());
-            }
-        }
-
-    }
-
-    private void refreshMicrologsRecyclerView() {
-        MapAndListFragment.mapBus.post(new RefreshMicrologsEvent());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            mGoogleApiClient.disconnect();
-        }
-
     }
 }

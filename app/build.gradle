@@ -58,4 +58,7 @@ dependencies {
 
     compile group: 'net.sourceforge.jexcelapi', name: 'jxl', version: '2.6.12'
 
+    compile 'com.karumi:dexter:4.2.0'
+
+
 }
