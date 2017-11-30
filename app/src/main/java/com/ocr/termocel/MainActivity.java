@@ -326,6 +326,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.e(TAG, "ACCURACY " + String.valueOf(location.getAccuracy()));
 
         MapAndListFragment.mapBus.post(mLatLng);
+        DetailFragment.bus.post(mLatLng);
 
 //        getLocationsFromBackend(mLatLng);
 

@@ -113,5 +113,8 @@
     <string name="help_detail_container">Aquí puede ver los datos de su microlog y su ultima actualización</string>
     <string name="help_telephone_consult">Para cambiar el modo a solo consulta, active este switch. En este modo solo se pedirán actualizaciones de cada sección.</string>
     <string name="help_history_export">Presione aquí para exportar su historial y mandarlo como .xls. Se le presentaran varias opciones de preferencia elija su cliente de correo electrónico.</string>
+    <string name="dialog_update_positive">Actualizar</string>
+    <string name="dialog_update_negative">Cancelar</string>
+    <string name="dialog_edit_sensor_title">Editar Sensor</string>
 
 </resources>

@@ -21,6 +21,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -30,6 +32,8 @@ import android.widget.Toast;
 import com.activeandroid.query.Select;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
+import com.google.android.gms.maps.model.LatLng;
+import com.ocr.termocel.events.EditNameEvent;
 import com.ocr.termocel.events.GoToDetailEvent;
 import com.ocr.termocel.model.Microlog;
 import com.ocr.termocel.model.Temperature;
@@ -58,58 +62,43 @@ import butterknife.OnClick;
 public class DetailFragment extends Fragment {
 
 
-    private final String TAG = MainActivity.class.getSimpleName();
-
     public static Bus bus;
-
-    private Microlog microlog;
-
-    private String mContactName;
-    private String mTelephoneNumber;
-
+    private final String TAG = MainActivity.class.getSimpleName();
     private final String STATUS = "S";
-
     SmsManager smsManager;
-
-    private boolean isSomethingSelected = false;
-
     List<Temperature> mTemperatures;
-
     boolean comesFromReceiver = false;
-
-    private ShowcaseView mShowcaseView;
-    private int mShowCaseCounter = 0;
-
-
     @BindView(R.id.textViewContactName)
     TextView textViewContactName;
-
     @BindView(R.id.textViewTelephone)
     TextView textViewTelephone;
-
     @BindView(R.id.textViewLastKnownTemp)
     TextView textViewLastKnownTemp;
-
     @BindView(R.id.textViewStatus)
     TextView textViewStatus;
-
     @BindView(R.id.textViewHumidity)
     TextView textViewHumidity;
-
     @BindView(R.id.textViewNoInfo)
     TextView textViewNoInfo;
-
     @BindView(R.id.textViewLastUpdateDate)
     TextView textViewLastUpdateDate;
-
     @BindView(R.id.lastDataContainer)
     LinearLayout lastDataContainer;
-
     @BindView(R.id.seekBarThermometer)
     SeekBar seekBarThermometer;
-
     @BindView(R.id.buttonUpdateState)
     Button mButtonUpdateSelected;
+    private Microlog mMicrolog;
+    private String mContactName;
+    private String mTelephoneNumber;
+    private boolean isSomethingSelected = false;
+    private ShowcaseView mShowcaseView;
+    private int mShowCaseCounter = 0;
+    private LatLng mLatLng;
+
+    public DetailFragment() {
+        // Required empty public constructor
+    }
 
     @OnClick(R.id.buttonUpdateState)
     public void buttonClicked() {
@@ -125,11 +114,6 @@ public class DetailFragment extends Fragment {
                 .setNegativeButton(getString(R.string.dialog_no), null)
                 .show();
     }
-
-    public DetailFragment() {
-        // Required empty public constructor
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -150,8 +134,8 @@ public class DetailFragment extends Fragment {
         comesFromReceiver = intent.getBooleanExtra(Constants.EXTRA_COMES_FROM_RECEIVER, false);
         if (comesFromReceiver) {
             mTelephoneNumber = intent.getStringExtra(MessageReceiver.EXTRA_PHONE_NUMBER);
-            microlog = getMicrologByPhoneNumber(mTelephoneNumber);
-            mContactName = microlog.name;
+            mMicrolog = getMicrologByPhoneNumber(mTelephoneNumber);
+            mContactName = mMicrolog.name;
         }
 
         isSomethingSelected = MainActivity.getIsSomethingSelected();
@@ -174,7 +158,7 @@ public class DetailFragment extends Fragment {
     }
 
     /**
-     * In here we define what happens when we click a microlog from the recycler view
+     * In here we define what happens when we click a mMicrolog from the recycler view
      *
      * @param event
      */
@@ -182,9 +166,9 @@ public class DetailFragment extends Fragment {
     public void micrologClicked(GoToDetailEvent event) {
         if (event != null) {
             isSomethingSelected = true;
-            microlog = event.getMicrolog();
-            mTelephoneNumber = microlog.sensorPhoneNumber;
-            mContactName = microlog.name;
+            mMicrolog = event.getMicrolog();
+            mTelephoneNumber = mMicrolog.sensorPhoneNumber;
+            mContactName = mMicrolog.name;
 
             textViewTelephone.setText(mTelephoneNumber);
             textViewContactName.setText(mContactName);
@@ -194,6 +178,70 @@ public class DetailFragment extends Fragment {
 
 
         }
+    }
+
+    @Subscribe
+    public void updateLatLng(LatLng latLng) {
+        mLatLng = latLng;
+    }
+
+    @OnClick(R.id.fab_edit)
+    public void buttonEditClicked() {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog_edit, null);
+
+        final EditText editTextName = (EditText) view.findViewById(R.id.editTextDialogEditName);
+        final EditText editTextLat = (EditText) view.findViewById(R.id.editTextDialogEditLat);
+        final EditText editTextLon = (EditText) view.findViewById(R.id.editTextDialogEditLon);
+
+        ImageButton imageButtonActualCords = (ImageButton) view.findViewById(R.id.imageButtonActualCords);
+        imageButtonActualCords.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mLatLng != null) {
+                    editTextLat.setText(String.valueOf(mLatLng.latitude));
+                    editTextLon.setText(String.valueOf(mLatLng.longitude));
+                }
+            }
+        });
+
+        if (mMicrolog != null) {
+            editTextName.setText(mMicrolog.getName());
+            editTextLat.setText(String.valueOf(mMicrolog.getLatitude()));
+            editTextLon.setText(String.valueOf(mMicrolog.getLongitude()));
+        }
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
+        builder.setView(view);
+
+        builder.setTitle(R.string.dialog_edit_sensor_title);
+        builder.setPositiveButton(R.string.dialog_update_positive, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (!editTextName.getText().toString().isEmpty()) {
+                    mMicrolog.setName(editTextName.getText().toString());
+                    mMicrolog.setLatitude(Double.parseDouble(editTextLat.getText().toString()));
+                    mMicrolog.setLongitude(Double.parseDouble(editTextLon.getText().toString()));
+                    mMicrolog.save();
+
+                    mTelephoneNumber = mMicrolog.getSensorPhoneNumber();
+                    mContactName = mMicrolog.getName();
+
+                    textViewTelephone.setText(mTelephoneNumber);
+                    textViewContactName.setText(mContactName);
+
+                    MapAndListFragment.mapBus.post(new EditNameEvent());
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.dialog_update_negative, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+
     }
 
 

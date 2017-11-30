@@ -37,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.ocr.termocel.custom.recyclerView.CustomAdapter;
 import com.ocr.termocel.custom.recyclerView.EmptyRecyclerView;
+import com.ocr.termocel.events.EditNameEvent;
 import com.ocr.termocel.events.RefreshMicrologsEvent;
 import com.ocr.termocel.events.SelectContactFromPhoneEvent;
 import com.ocr.termocel.events.SensorClickedEvent;
@@ -61,30 +62,30 @@ import butterknife.Unbinder;
  */
 public class MapAndListFragment extends Fragment implements OnMapReadyCallback {
 
-    private final String TAG = MapAndListFragment.class.getSimpleName();
-
-//    public static List<MessagesLocation> mLocations;
-
-    private static View view;
-
-    public static Bus mapBus;
-
-    private Unbinder unbinder;
-
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 200;
 
-
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+//    public static List<MessagesLocation> mLocations;
+    public static Bus mapBus;
+    private static View view;
+    private final String TAG = MapAndListFragment.class.getSimpleName();
+    protected CustomAdapter mAdapter;
+    protected RecyclerView.LayoutManager mLayoutManager;
 
 //    private HashMap<String, GoLockyMarker> eventMarkerMap;
 
 //    public static GoLockyMarker goLockyMarker;
-
+protected List<Microlog> mDataSet;
+    @BindView(R.id.my_recycler_view)
+    EmptyRecyclerView mRecyclerView;
+    @BindView(R.id.textViewSelectMicrolog)
+    TextView mTextViewSelectMicrolog;
+    @BindView(R.id.fab_menu)
+    FloatingActionsMenu mFloatingActionsMenu;
+    private Unbinder unbinder;
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LatLng mLatLong;
-
     private AlertDialog mMarkerDialog = null;
     private AlertDialog mAddDialog = null;
-
     private ShowcaseView mShowcaseView;
     private int mShowCaseCounter = 0;
 
@@ -92,15 +93,6 @@ public class MapAndListFragment extends Fragment implements OnMapReadyCallback {
     public MapAndListFragment() {
         // Required empty public constructor
     }
-
-    @BindView(R.id.my_recycler_view)
-    EmptyRecyclerView mRecyclerView;
-
-    @BindView(R.id.textViewSelectMicrolog)
-    TextView mTextViewSelectMicrolog;
-
-    @BindView(R.id.fab_menu)
-    FloatingActionsMenu mFloatingActionsMenu;
 
     @OnClick(R.id.fab_add)
     public void addNewContactClicked() {
@@ -112,12 +104,6 @@ public class MapAndListFragment extends Fragment implements OnMapReadyCallback {
         MainActivity.bus.post(new SelectContactFromPhoneEvent());
         askForPermissions();
     }
-
-
-    protected CustomAdapter mAdapter;
-    protected RecyclerView.LayoutManager mLayoutManager;
-    protected List<Microlog> mDataSet;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -264,6 +250,13 @@ public class MapAndListFragment extends Fragment implements OnMapReadyCallback {
         CameraUpdate cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(latLng, 17);
         mMap.animateCamera(cameraUpdateFactory);
     }
+
+    @Subscribe
+    public void callToInitDataSetFromDetail(EditNameEvent event) {
+        initDataSet();
+        mAdapter.notifyDataSetChanged();
+    }
+
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
