@@ -34,30 +34,29 @@ import butterknife.OnClick;
 public class SetPointsActivity extends AppCompatActivity {
 
     private final String TAG = SetPointsActivity.class.getSimpleName();
-
-    private int mTemp1 = 36;
-    private int mTemp2 = 33;
-    private int mTemp3 = 28;
-
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
     @BindView(R.id.editTextMicrologId)
     EditText editTextMicrologId;
-
     @BindView(R.id.seekBarSetPoint1)
     SeekBar seekBarSetPoint1;
     @BindView(R.id.seekBarSetPoint2)
     SeekBar seekBarSetPoint2;
     @BindView(R.id.seekBarSetPoint3)
     SeekBar seekBarSetPoint3;
-
     @BindView(R.id.editTextSetPoint1)
     EditText editTextSetPoint1;
     @BindView(R.id.editTextSetPoint2)
     EditText editTextSetPoint2;
     @BindView(R.id.editTextSetPoint3)
     EditText editTextSetPoint3;
+    SmsManager smsManager;
+    private int mTemp1 = 36;
+    private int mTemp2 = 33;
+    private int mTemp3 = 28;
+    private String sensorTelephoneNumber;
+    private List<SetPoint> mSetPointList;
+    private Microlog mMicrolog;
 
     @OnClick(R.id.buttonSetPointAll)
     public void setAllSetPointsClicked() {
@@ -102,15 +101,6 @@ public class SetPointsActivity extends AppCompatActivity {
             showAlertDialog(getString(R.string.dialog_title_set_point) + " 3", getString(R.string.dialog_message_confirm_sms), 2);
         }
     }
-
-
-    SmsManager smsManager;
-
-    private String sensorTelephoneNumber;
-
-    private List<SetPoint> mSetPointList;
-
-    private Microlog mMicrolog;
 
     @Override
 
@@ -329,20 +319,21 @@ public class SetPointsActivity extends AppCompatActivity {
     private void sendSMS(int i) {
         String micrologId = mMicrolog.sensorId;
         String hex;
+        String ESC_address = "01X";
         switch (i) {
             case 0:
                 hex = Integer.toHexString(Integer.parseInt(editTextSetPoint1.getText().toString()));
-                smsManager.sendTextMessage(sensorTelephoneNumber, null, micrologId + "SX100" + hex, null, null);
+                smsManager.sendTextMessage(sensorTelephoneNumber, null, ESC_address + micrologId + "SX100" + hex, null, null);
                 Toast.makeText(this, getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
                 break;
             case 1:
                 hex = Integer.toHexString(Integer.parseInt(editTextSetPoint2.getText().toString()));
-                smsManager.sendTextMessage(sensorTelephoneNumber, null, micrologId + "SX200" + hex, null, null);
+                smsManager.sendTextMessage(sensorTelephoneNumber, null, ESC_address + micrologId + "SX200" + hex, null, null);
                 Toast.makeText(this, getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
                 break;
             case 2:
                 hex = Integer.toHexString(Integer.parseInt(editTextSetPoint3.getText().toString()));
-                smsManager.sendTextMessage(sensorTelephoneNumber, null, micrologId + "SX300" + hex, null, null);
+                smsManager.sendTextMessage(sensorTelephoneNumber, null, ESC_address + micrologId + "SX300" + hex, null, null);
                 Toast.makeText(this, getString(R.string.toast_message_send), Toast.LENGTH_SHORT).show();
                 break;
         }
