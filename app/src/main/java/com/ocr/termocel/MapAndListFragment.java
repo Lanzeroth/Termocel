@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,7 +35,9 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.ocr.termocel.custom.recyclerView.CustomAdapter;
 import com.ocr.termocel.custom.recyclerView.EmptyRecyclerView;
 import com.ocr.termocel.events.EditNameEvent;
@@ -64,7 +67,7 @@ public class MapAndListFragment extends Fragment implements OnMapReadyCallback {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 200;
 
-//    public static List<MessagesLocation> mLocations;
+    //    public static List<MessagesLocation> mLocations;
     public static Bus mapBus;
     private static View view;
     private final String TAG = MapAndListFragment.class.getSimpleName();
@@ -73,14 +76,15 @@ public class MapAndListFragment extends Fragment implements OnMapReadyCallback {
 
 //    private HashMap<String, GoLockyMarker> eventMarkerMap;
 
-//    public static GoLockyMarker goLockyMarker;
-protected List<Microlog> mDataSet;
+    //    public static GoLockyMarker goLockyMarker;
+    protected List<Microlog> mDataSet;
     @BindView(R.id.my_recycler_view)
     EmptyRecyclerView mRecyclerView;
     @BindView(R.id.textViewSelectMicrolog)
     TextView mTextViewSelectMicrolog;
     @BindView(R.id.fab_menu)
     FloatingActionsMenu mFloatingActionsMenu;
+    LatLngBounds mBounds;
     private Unbinder unbinder;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LatLng mLatLong;
@@ -88,7 +92,6 @@ protected List<Microlog> mDataSet;
     private AlertDialog mAddDialog = null;
     private ShowcaseView mShowcaseView;
     private int mShowCaseCounter = 0;
-
 
     public MapAndListFragment() {
         // Required empty public constructor
@@ -289,6 +292,15 @@ protected List<Microlog> mDataSet;
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         setUpMap();
+        if (mMap != null && mDataSet != null && !mDataSet.isEmpty()) {
+            populateTheMap();
+            if (mBounds != null) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mBounds, 100));
+            } else if (mLatLong != null && mLatLong.latitude != 0.0 && mLatLong.longitude != 0.0) {
+                CameraUpdate cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(mLatLong, 17);
+                mMap.animateCamera(cameraUpdateFactory);
+            }
+        }
     }
 
     /**
@@ -299,14 +311,8 @@ protected List<Microlog> mDataSet;
      */
     private void setUpMap() {
         if (this.getContext() != null) {
+            // get permissions on first run
             if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 return;
             }
             mMap.setMyLocationEnabled(true);
@@ -319,14 +325,16 @@ protected List<Microlog> mDataSet;
                 }
             });
 
-            // Initiate loadings
 
-            mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-                @Override
-                public void onMapLoaded() {
-//                MainActivity.bus.post(new StartRegisteringUserEvent(StartRegisteringUserEvent.Type.STARTED, 1));
-                }
-            });
+            // Initiate loadings
+            if (mBounds != null) {
+                mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                    @Override
+                    public void onMapLoaded() {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mBounds, 100));
+                    }
+                });
+            }
         }
     }
 
@@ -335,13 +343,50 @@ protected List<Microlog> mDataSet;
     public void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-//        if (mMap != null && mLocations != null && !mLocations.isEmpty()) {
-//            populateTheMap(mLocations);
-//            if (mLatLong != null && mLatLong.latitude != 0.0 && mLatLong.longitude != 0.0) {
-//                CameraUpdate cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(mLatLong, 17);
-//                mMap.animateCamera(cameraUpdateFactory);
-//            }
-//        }
+
+    }
+
+    /**
+     * Create Makers on the map based on backend info
+     */
+    private void populateTheMap() {
+        Log.e("populate", "populate called");
+        if (mDataSet != null) {
+            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+            String markerAddress = "";
+            Double markerReward = 0.0;
+            String markerName = "";
+            String markerPictureURL = "";
+            String snippetName = "";
+
+            mMap.clear();
+
+            int index = 0;
+            boolean weHaveBounds = false;
+            for (Microlog microlog : mDataSet) {
+                if (microlog.getLatitude() != 0 && microlog.getLongitude() != 0) {
+                    weHaveBounds = true;
+                    if (microlog.getName() != null) {
+                        markerName = microlog.getName();
+                    }
+                    snippetName = microlog.getSensorPhoneNumber();
+                    LatLng latLng = new LatLng(microlog.getLatitude(), microlog.getLongitude());
+
+                    boundsBuilder.include(latLng);
+
+                    Marker marker = mMap.addMarker(new MarkerOptions()
+                            .position(latLng)
+                            .snippet(snippetName)
+                            .title(markerName));
+                }
+
+            }
+            if (weHaveBounds) {
+                mBounds = boundsBuilder.build();
+            }
+        }
+
     }
 
     @Override
@@ -350,7 +395,7 @@ protected List<Microlog> mDataSet;
         unbinder.unbind();
     }
 
-    private void askForPermissions(){
+    private void askForPermissions() {
         if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this.getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS},
@@ -367,7 +412,6 @@ protected List<Microlog> mDataSet;
     }
 
 
-
     private void inflateAddDialogFragment() {
 
         askForPermissions();
@@ -379,6 +423,8 @@ protected List<Microlog> mDataSet;
 
         final EditText editTextName = (EditText) view.findViewById(R.id.editTextName);
 
+        final EditText editTextMicrologID = view.findViewById(R.id.editTextID);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
             @Override
@@ -386,7 +432,7 @@ protected List<Microlog> mDataSet;
                 if (!editTextNewPhoneNumber.getText().toString().equalsIgnoreCase("")) {
                     Microlog microlog = new Microlog(
                             editTextNewPhoneNumber.getText().toString(),
-                            null,
+                            editTextMicrologID.getText().toString(),
                             editTextName.getText().toString(),
                             "NORMAL",
                             3

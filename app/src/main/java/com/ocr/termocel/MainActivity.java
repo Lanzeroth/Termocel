@@ -90,7 +90,8 @@ public class MainActivity extends AppCompatActivity implements
                 .withPermissions(Manifest.permission.READ_CONTACTS,
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.READ_SMS)
+                        Manifest.permission.READ_SMS,
+                        Manifest.permission.SEND_SMS)
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {/* ... */}
@@ -405,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements
                             }
                             Microlog microlog = new Microlog(
                                     no,
-                                    null,
+                                    "01",
                                     name,
                                     null,
                                     3

@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Nombre" />
+        android:text="@string/dialog_edit_name" />
 
     <EditText
         android:id="@+id/editTextDialogEditName"
@@ -20,12 +20,27 @@
         android:singleLine="true" />
 
     <TextView
+        android:id="@+id/textView14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/selector_microlog_id" />
+
+    <EditText
+        android:id="@+id/editTextDialogEditMicrologId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:inputType="numberDecimal"
+        android:singleLine="true" />
+
+    <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:text="Latitud" />
+        android:text="@string/dialog_edit_lat" />
 
     <EditText
         android:id="@+id/editTextDialogEditLat"
@@ -40,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Longitud" />
+        android:text="@string/dialog_edit_lon" />
 
     <EditText
         android:id="@+id/editTextDialogEditLon"
@@ -56,6 +71,6 @@
         android:layout_height="40dp"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/custom_button_ocr"
-        android:elevation="8dp"
+        android:elevation="@dimen/fab_elevation"
         android:src="@drawable/ic_my_location_white_24dp" />
 </LinearLayout>

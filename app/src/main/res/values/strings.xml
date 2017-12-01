@@ -40,6 +40,7 @@
     <string name="selector_existing_contact">Seleccionar Microlog de lista de contactos</string>
     <string name="selector_telephone_number">Numero de teléfono</string>
     <string name="selector_id_name">Nombre Identificador</string>
+    <string name="selector_microlog_id">ID Microlog</string>
     <string name="selector_button_save">Guardar</string>
     <string name="selector_select_contact">Seleccione el Microlog</string>
 
@@ -116,5 +117,11 @@
     <string name="dialog_update_positive">Actualizar</string>
     <string name="dialog_update_negative">Cancelar</string>
     <string name="dialog_edit_sensor_title">Editar Sensor</string>
+
+
+    <string name="dialog_edit_lat">Latitud</string>
+    <string name="dialog_edit_lon">Longitud</string>
+    <string name="dialog_edit_name">Nombre</string>
+
 
 </resources>

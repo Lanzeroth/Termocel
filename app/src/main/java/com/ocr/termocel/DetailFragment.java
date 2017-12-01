@@ -193,6 +193,7 @@ public class DetailFragment extends Fragment {
         final EditText editTextName = (EditText) view.findViewById(R.id.editTextDialogEditName);
         final EditText editTextLat = (EditText) view.findViewById(R.id.editTextDialogEditLat);
         final EditText editTextLon = (EditText) view.findViewById(R.id.editTextDialogEditLon);
+        final EditText editTextID = (EditText) view.findViewById(R.id.editTextDialogEditMicrologId);
 
         ImageButton imageButtonActualCords = (ImageButton) view.findViewById(R.id.imageButtonActualCords);
         imageButtonActualCords.setOnClickListener(new View.OnClickListener() {
@@ -207,6 +208,7 @@ public class DetailFragment extends Fragment {
 
         if (mMicrolog != null) {
             editTextName.setText(mMicrolog.getName());
+            editTextID.setText(mMicrolog.getSensorId());
             editTextLat.setText(String.valueOf(mMicrolog.getLatitude()));
             editTextLon.setText(String.valueOf(mMicrolog.getLongitude()));
         }
@@ -220,6 +222,7 @@ public class DetailFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 if (!editTextName.getText().toString().isEmpty()) {
                     mMicrolog.setName(editTextName.getText().toString());
+                    mMicrolog.setSensorId(editTextID.getText().toString());
                     mMicrolog.setLatitude(Double.parseDouble(editTextLat.getText().toString()));
                     mMicrolog.setLongitude(Double.parseDouble(editTextLon.getText().toString()));
                     mMicrolog.save();
