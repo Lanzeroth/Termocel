@@ -207,6 +207,8 @@ public class MapAndListFragment extends Fragment implements OnMapReadyCallback {
 
         mAdapter = new CustomAdapter(mDataSet);
         mRecyclerView.setAdapter(mAdapter);
+
+        populateTheMap();
     }
 
     private void hideFloatingActionsMenu() {
@@ -250,14 +252,20 @@ public class MapAndListFragment extends Fragment implements OnMapReadyCallback {
     @Subscribe
     public void handleLocation(LatLng latLng) {
         mLatLong = latLng;
-        CameraUpdate cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(latLng, 17);
-        mMap.animateCamera(cameraUpdateFactory);
+        if (mBounds != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(mBounds, 100));
+        } else {
+            CameraUpdate cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(latLng, 17);
+            mMap.animateCamera(cameraUpdateFactory);
+        }
+
     }
 
     @Subscribe
     public void callToInitDataSetFromDetail(EditNameEvent event) {
         initDataSet();
         mAdapter.notifyDataSetChanged();
+        populateTheMap();
     }
 
 
