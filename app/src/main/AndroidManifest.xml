@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.ocr.termocel"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ocr.termocel">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -64,7 +64,7 @@
             android:value="termocel.db"/>
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="9"/>
+            android:value="10" />
         <meta-data
             android:name="AA_MODELS"
             android:value="com.ocr.termocel.model.Microlog, com.ocr.termocel.model.Temperature, com.ocr.termocel.model.Telephone, com.ocr.termocel.model.SetPoint"/>
